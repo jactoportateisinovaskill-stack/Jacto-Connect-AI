@@ -1,64 +1,100 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+
+import { useRouter } from "next/navigation";
+import { Briefcase, Wrench, ArrowRight } from "lucide-react";
+import { Logo } from "@/components/jacto/Shell";
+import { LanguageSwitcher } from "@/components/jacto/LanguageSwitcher";
+import { useCargo, type Cargo, CARGO_LABELS, getCargo } from "@/lib/profile";
+import { useLocale } from "@/i18n";
+
+const OPTIONS: { id: Cargo; icon: React.ReactNode; desc: { pt: string; en: string; es: string } }[] = [
+  {
+    id: "gestor",
+    icon: <Briefcase className="h-6 w-6" />,
+    desc: {
+      pt: "Acesso a métricas e insights operacionais.",
+      en: "Access to operational metrics and insights.",
+      es: "Acceso a métricas e insights operacionales.",
+    },
+  },
+  {
+    id: "parceiro",
+    icon: <Wrench className="h-6 w-6" />,
+    desc: {
+      pt: "Produtor, operador do equipamento, revenda autorizada ou assistência técnica.",
+      en: "Producer, equipment operator, authorized reseller or technical support.",
+      es: "Productor, operador del equipo, distribuidor autorizado o asistencia técnica.",
+    },
+  },
+];
+
+export default function CargoPage() {
+  const router = useRouter();
+  const { locale } = useLocale();
+  const [cargo, setCargo] = useCargo();
+
+
+
+  const labels = {
+    pt: { title: "Qual é o seu cargo?", subtitle: "Selecione o perfil que melhor representa o seu acesso.", cta: "Prosseguir" },
+    en: { title: "What is your role?", subtitle: "Pick the profile that best matches your access.", cta: "Continue" },
+    es: { title: "¿Cuál es su cargo?", subtitle: "Elija el perfil que mejor representa su acceso.", cta: "Continuar" },
+  }[locale];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-muted/40 to-background">
+      <header className="flex items-center justify-between px-5 pt-5 sm:px-8">
+        <Logo />
+        <LanguageSwitcher />
+      </header>
+
+      <main className="mx-auto flex max-w-md flex-col px-6 pt-10 sm:pt-16">
+        <span className="self-center rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-primary">
+          Jacto Connect IA
+        </span>
+        <h1 className="mt-4 text-center text-2xl font-extrabold leading-tight tracking-tight text-secondary sm:text-3xl">
+          {labels.title}
+        </h1>
+        <p className="mt-2 text-center text-sm text-muted-foreground">{labels.subtitle}</p>
+
+        <div className="mt-7 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {OPTIONS.map((opt) => {
+            const active = cargo === opt.id;
+            return (
+              <button
+                key={opt.id}
+                onClick={() => setCargo(opt.id)}
+                className={`flex flex-col items-start gap-2 rounded-2xl border-2 p-4 text-left transition shadow-[var(--shadow-card)] ${
+                  active
+                    ? "border-primary bg-primary/5 shadow-[var(--shadow-glow)]"
+                    : "border-border bg-card hover:border-primary/40"
+                }`}
+              >
+                <div
+                  className={`flex h-11 w-11 items-center justify-center rounded-xl ${
+                    active ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                  }`}
+                >
+                  {opt.icon}
+                </div>
+                <div className="text-base font-extrabold text-secondary">
+                  {CARGO_LABELS[opt.id][locale]}
+                </div>
+                <p className="text-xs text-muted-foreground">{opt.desc[locale]}</p>
+              </button>
+            );
+          })}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        <button
+          onClick={() => cargo && router.push(cargo === "gestor" ? "/insights" : "/equipamento")}
+          disabled={!cargo}
+          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition active:scale-[0.98] disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none"
+        >
+          {labels.cta}
+          <ArrowRight className="h-4 w-4" />
+        </button>
       </main>
     </div>
   );

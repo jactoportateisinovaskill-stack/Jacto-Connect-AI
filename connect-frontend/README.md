@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Jacto Connect AI
 
-## Getting Started
+## Como rodar o frontend do projeto
 
-First, run the development server:
+Siga as instruções abaixo para executar o projeto localmente na sua máquina.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Pré-requisitos
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Certifique-se de ter instalado na sua máquina:
+- [Node.js](https://nodejs.org/en/) (versão 18 ou superior)
+- Gerenciador de pacotes npm (já vem com o Node.js)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Passos para instalação e execução
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Abra o terminal** na pasta do projeto (`connect-frontend`).
 
-## Learn More
+2. **Instale as dependências** do projeto rodando o seguinte comando:
+   ```bash
+   npm install
+   ```
+   *(Este comando fará o download de todas as bibliotecas necessárias, como o Next.js, Tailwind, Lucide React, etc).*
 
-To learn more about Next.js, take a look at the following resources:
+3. **Inicie o servidor de desenvolvimento** rodando:
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Acesse o sistema**:
+   Abra o seu navegador de preferência e acesse o endereço local:
+   [http://localhost:3000](http://localhost:3000)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+### Principais Tecnologias e Bibliotecas
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Next.js 15+** (App Router) - Framework React
+- **React 19** - Biblioteca para interfaces de usuário
+- **Tailwind CSS** - Estilização utilitária
+- **Framer Motion** - Animações fluidas de UI
+- **Lucide React** - Ícones
+- **Radix UI** - Acessibilidade e componentes de baixo nível
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+###  Estrutura de Rotas
+
+O sistema apresenta roteamento dependente do papel de acesso do usuário, selecionado logo na tela inicial:
+- **Técnico / Parceiro / Usuário**: Redirecionado para `/equipamento`, passando pelo fluxo de capturar imagem (`/capturar`), análise de IA (`/analisando`) e catálogo de resultado (`/resultado`).
+- **Gestor**: Redirecionado para o dashboard executivo (`/insights`), exibindo um mapa de calor global e métricas de peças.
+
+*Dica: Você pode alternar o idioma na página inicial (Português, Inglês e Espanhol), e todas as telas refletirão a internacionalização dinamicamente.*
