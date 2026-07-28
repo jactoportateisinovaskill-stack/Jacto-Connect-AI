@@ -4,8 +4,11 @@ from PIL import Image
 import io
 
 
-model_path: str = "src/yolo_model/best.onnx"
+model_path: str = "src/yolo_model/best.pt"
 model = YOLO(model_path)
+
+print(model.names)
+print(len(model.names))
 
 def detectar_peca(image_bytes: bytes) -> dict:
     imagem = Image.open(io.BytesIO(image_bytes))
