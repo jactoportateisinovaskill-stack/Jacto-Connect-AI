@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ScanLine, Cpu, Sparkles, CheckCircle2 } from "lucide-react";
 import { useT } from "@/i18n";
 import { Shell } from "@/components/jacto/Shell";
+import { useDetection } from "@/lib/DetectionContext";
+import { toast } from "sonner";
 
 export default function Analisando() {
   const t = useT();
@@ -15,20 +17,54 @@ export default function Analisando() {
   ];
   const router = useRouter();
   const [pct, setPct] = useState(0);
+  const { imageFile, setDetectionResult } = useDetection();
+  const isDoneRef = useRef(false);
 
   useEffect(() => {
-    const t = setInterval(() => {
+    const tTimer = setInterval(() => {
       setPct((p) => {
+        if (p >= 90 && !isDoneRef.current) {
+          return 90;
+        }
         if (p >= 100) {
-          clearInterval(t);
+          clearInterval(tTimer);
           setTimeout(() => router.push("/resultado"), 120);
           return 100;
         }
-        return p + 10;
+        return p + 5;
       });
-    }, 45);
-    return () => clearInterval(t);
+    }, 100);
+    return () => clearInterval(tTimer);
   }, [router]);
+
+  useEffect(() => {
+    async function upload() {
+      if (!imageFile) {
+        isDoneRef.current = true;
+        return;
+      }
+      try {
+        const formData = new FormData();
+        formData.append("foto", imageFile);
+        
+        const res = await fetch("http://localhost:8000/api/detection", {
+          method: "POST",
+          body: formData,
+        });
+        
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        setDetectionResult(data);
+      } catch (err) {
+        console.error(err);
+        toast.error("Erro na análise. Usando dados padrão.");
+      } finally {
+        isDoneRef.current = true;
+        setPct(100);
+      }
+    }
+    upload();
+  }, [imageFile, setDetectionResult]);
 
   const activeIdx = Math.min(steps.length - 1, Math.floor((pct / 100) * steps.length));
 

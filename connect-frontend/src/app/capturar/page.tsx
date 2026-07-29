@@ -6,18 +6,22 @@ import Image from "next/image";
 import { Camera, ImagePlus, X } from "lucide-react";
 import { useT } from "@/i18n";
 import { Shell } from "@/components/jacto/Shell";
+import { useDetection } from "@/lib/DetectionContext";
 
 export default function Capturar() {
   const t = useT();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const { setImageFile } = useDetection();
 
   const goAnalyze = () => router.push("/analisando");
 
   const onPick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setImageFile(file);
     const url = URL.createObjectURL(file);
     setPreview(url);
     // Auto-analyze right after the photo is received.
@@ -94,7 +98,13 @@ export default function Capturar() {
         </button>
 
         <button
-          onClick={goAnalyze}
+          onClick={() => {
+            if (preview) {
+              goAnalyze();
+            } else {
+              cameraRef.current?.click();
+            }
+          }}
           className="relative flex h-20 w-20 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[var(--shadow-glow)] active:scale-95 transition"
           aria-label={preview ? t("capture.analyzeImg") : t("capture.capturePhoto")}
         >
@@ -110,6 +120,14 @@ export default function Capturar() {
         ref={fileRef}
         type="file"
         accept="image/*"
+        className="hidden"
+        onChange={onPick}
+      />
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
         className="hidden"
         onChange={onPick}
       />

@@ -36,6 +36,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
+import { useDetection } from "@/lib/DetectionContext";
 
 interface Related {
   code: string;
@@ -62,6 +63,7 @@ export default function Resultado() {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const { detectionResult } = useDetection();
 
   const submitRating = () => {
     if (rating === 0 || submitted) return;
@@ -70,6 +72,13 @@ export default function Resultado() {
       description: `${t("rating.feedback")} (${rating}/5).`,
     });
   };
+
+  const rawName = detectionResult?.nome_peca || "Bico Completo JD-12 - 427062";
+  const parts = rawName.split("-");
+  const detectedName = parts[0]?.trim();
+  const detectedCode = parts.length > 1 ? parts[1]?.trim() : (detectionResult ? "N/A" : "427062");
+
+  const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 94;
 
   return (
     <Shell back="/capturar" title={t("result.title")}>
@@ -80,7 +89,7 @@ export default function Resultado() {
             <div className="h-24 w-16 rounded-[40%] bg-gradient-to-b from-zinc-300 via-zinc-400 to-zinc-600 rotate-12 shadow-2xl" />
           </div>
           <div className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-success px-2 py-1 text-[10px] font-extrabold text-success-foreground shadow-md">
-            <CheckCircle2 className="h-3 w-3" /> 94%
+            <CheckCircle2 className="h-3 w-3" /> {confidencePercent}%
           </div>
           <div className="absolute top-2 right-2 rounded-full bg-black/50 backdrop-blur px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
             {t("compat.identified")}
@@ -90,10 +99,10 @@ export default function Resultado() {
         {/* Identified card */}
         <div className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">
           <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-primary">
-            <Tag className="h-3 w-3" /> {t("result.code")}: 427062
+            <Tag className="h-3 w-3" /> {t("result.code")}: {detectedCode}
           </div>
           <h2 className="mt-2 text-2xl font-extrabold leading-tight text-secondary">
-            Bico Completo JD-12
+            {detectedName}
           </h2>
           <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
             <Tractor className="h-4 w-4 text-secondary" />
