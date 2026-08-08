@@ -10,6 +10,9 @@ import psycopg2
 from psycopg2 import sql
 from sqlalchemy.engine import make_url
 
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_database_url() -> str:
     database_url = os.getenv("DATABASE_URL")
@@ -111,7 +114,7 @@ def create_schema(database_url: str) -> None:
 
 def main() -> None:
     database_url = get_database_url()
-    create_database(database_url)
+    # create_database(database_url)
     create_schema(database_url)
 
 
