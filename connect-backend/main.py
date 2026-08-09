@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.router.detection_router import router as yolo_router
+from src.router.get_database_router import router as get_database_router
 
 app = FastAPI(title="API Jacto Connect")
 
@@ -14,3 +15,4 @@ app.add_middleware(
 )
 
 app.include_router(yolo_router)
+app.include_router(get_database_router)
