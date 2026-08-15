@@ -1,11 +1,17 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
+from sqlalchemy.orm import Session
 from src.services.detection_service import detectar_peca
 from src.models.api_models import DeteccaoPeca
+from src.database.database_dependencies import get_db
 
 router: APIRouter = APIRouter(prefix="/api/detection")
 
 @router.post("", response_model=DeteccaoPeca)
-async def deteccao_peca(foto: UploadFile = File(...)):
+async def deteccao_peca(foto: UploadFile = File(...), db: Session = Depends(get_db)):
 
     image_bytes = await foto.read()
-    return detectar_peca(image_bytes)
+    deteccao = detectar_peca(image_bytes, db)
+    if not deteccao:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Peça não encontrada")
+
+    return deteccao
