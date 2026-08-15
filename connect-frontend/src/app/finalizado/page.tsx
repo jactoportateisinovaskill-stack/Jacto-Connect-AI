@@ -6,15 +6,31 @@ import { Shell } from "@/components/jacto/Shell";
 
 import { useT } from "@/i18n";
 
+import { useDetection } from "@/lib/DetectionContext";
+import { useEquipment } from "@/lib/equipment";
+
 export default function Finalizado() {
   const t = useT();
+  const { detectionResult } = useDetection();
+  const [stored] = useEquipment();
+
+  // Pegando o nome e o código vindos diretamente da API
+  const detectedName = detectionResult?.nome_peca || "Não encontrado";
+  const detectedCode = detectionResult?.codigo || "0";
+  
+  const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 0;
+
+  // Pegar data e hora atuais
+  const now = new Date();
+  const dataFormatada = now.toLocaleDateString("pt-BR");
+  const horaFormatada = now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 
   const resumo = [
-    [t("finish.itemIdent"), "Bico Completo JD-12 (427062)"],
-    [t("finish.usage"), "Jacto SB-B"],
-    [t("finish.tech"), "Carlos Silva · TEC-0047"],
-    [t("finish.date"), "16/05/2026 · 14:32"],
-    [t("finish.conf"), "94%"],
+    [t("finish.itemIdent"), `${detectedName} (${detectedCode})`],
+    [t("finish.usage"), stored?.modelo ? `Jacto ${stored.modelo}` : "Jacto (Desconhecido)"],
+    [t("finish.tech"), "Null"],
+    [t("finish.date"), `${dataFormatada} · ${horaFormatada}`],
+    [t("finish.conf"), `${confidencePercent}%`],
   ];
 
   return (

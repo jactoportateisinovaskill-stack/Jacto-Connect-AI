@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   CheckCircle2,
@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { useDetection } from "@/lib/DetectionContext";
+import { useEquipment } from "@/lib/equipment";
 
 interface Related {
   code: string;
@@ -44,19 +45,7 @@ interface Related {
   compat: string;
 }
 
-const related: Related[] = [
-  { code: "1168546", name: "Capa do bico JD-12", compat: "Bico JD-12 / SB-20B" },
-  { code: "999142", name: "Anel de vedação O-ring do bico", compat: "Bico JD-12 / SB-20B" },
-  { code: "999158", name: "Junta de vedação do porta-bico", compat: "Bico JD-12 / SB-20B" },
-  { code: "1168545", name: "Filtro do bico M50/60", compat: "Bico JD-12 / SB-20B" },
-  { code: "323456", name: "Tampa do reservatório SB-20B", compat: "Pulverizador SB-20B" },
-  { code: "323478", name: "Vedação da tampa do reservatório", compat: "Pulverizador SB-20B" },
-  { code: "445221", name: "Diafragma do registro LP 601", compat: "Registro / SB-20B" },
-  { code: "1217605", name: "Kit de reparo do registro LP 601", compat: "Registro / SB-20B" },
-];
-
-const YOUTUBE_URL =
-  "https://www.youtube.com/results?search_query=manuten%C3%A7%C3%A3o+Jacto+SB20";
+// Removidas constantes estáticas: related e YOUTUBE_URL
 
 export default function Resultado() {
   const t = useT();
@@ -64,6 +53,34 @@ export default function Resultado() {
   const [hover, setHover] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const { detectionResult } = useDetection();
+  const [stored] = useEquipment();
+  const [relatedParts, setRelatedParts] = useState<Related[]>([]);
+
+  useEffect(() => {
+    if (!detectionResult?.id) return;
+
+    Promise.all([
+      fetch("http://127.0.0.1:8000/api/database/pecas").then(r => r.json()),
+      fetch("http://127.0.0.1:8000/api/database/peca-relacionada").then(r => r.json())
+    ]).then(([parts, relations]) => {
+      if (Array.isArray(parts) && Array.isArray(relations)) {
+        const myRelations = relations.filter((r: any) => r.peca_id === detectionResult.id);
+        const mapped = myRelations.map((rel: any) => {
+          const p = parts.find((p: any) => p.id === rel.peca_relacionada_id);
+          if (!p) return null;
+          return {
+            code: p.codigo_jacto,
+            name: p.nome,
+            compat: "Compatível"
+          };
+        }).filter(Boolean);
+        setRelatedParts(mapped);
+      }
+    }).catch(err => {
+      console.error("Erro ao buscar peças relacionadas:", err);
+      setRelatedParts([]);
+    });
+  }, [detectionResult?.id]);
 
   const submitRating = () => {
     if (rating === 0 || submitted) return;
@@ -73,12 +90,10 @@ export default function Resultado() {
     });
   };
 
-  const rawName = detectionResult?.nome_peca || "Bico Completo JD-12 - 427062";
-  const parts = rawName.split("-");
-  const detectedName = parts[0]?.trim();
-  const detectedCode = parts.length > 1 ? parts[1]?.trim() : (detectionResult ? "N/A" : "427062");
+  const detectedName = detectionResult?.nome_peca || "Null";
+  const detectedCode = detectionResult?.codigo || "Null";
 
-  const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 94;
+  const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 0;
 
   return (
     <Shell back="/capturar" title={t("result.title")}>
@@ -106,7 +121,7 @@ export default function Resultado() {
           </h2>
           <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
             <Tractor className="h-4 w-4 text-secondary" />
-            {t("result.usage")} <span className="font-semibold text-secondary">Jacto SB-20B</span>
+            {t("result.usage")} <span className="font-semibold text-secondary">{stored?.modelo ? `Jacto ${stored.modelo}` : "Jacto (Desconhecido)"}</span>
           </div>
         </div>
 
@@ -114,7 +129,7 @@ export default function Resultado() {
         <div className="mt-4 space-y-3">
           {/* {t("result.buyTitle")} — destaque */}
           <a
-            href="https://www.jacto.com.br/pt/pecas-e-servicos"
+            href={detectionResult?.url_compra && detectionResult.url_compra !== "PREENCHER_LINK_OFICIAL" ? detectionResult.url_compra : "#"}
             target="_blank"
             rel="noopener noreferrer"
             className="relative flex h-16 w-full items-center gap-3 rounded-xl bg-gradient-to-r from-primary to-primary/80 px-5 font-extrabold text-primary-foreground shadow-[var(--shadow-glow)] ring-2 ring-primary/30 ring-offset-2 ring-offset-background active:scale-[0.98] transition"
@@ -147,7 +162,9 @@ export default function Resultado() {
                 </SheetDescription>
               </SheetHeader>
               <ul className="max-h-[60vh] overflow-y-auto px-5 pb-6 pt-2 space-y-2">
-                {related.map((r) => (
+                {relatedParts.length === 0 ? (
+                  <div className="text-center text-sm text-muted-foreground mt-4">Nenhuma peça relacionada encontrada.</div>
+                ) : relatedParts.map((r) => (
                   <li
                     key={r.code}
                     className="rounded-xl border border-border bg-card p-3 shadow-[var(--shadow-card)]"
@@ -245,7 +262,7 @@ export default function Resultado() {
           </Sheet>
 
           <a
-            href={YOUTUBE_URL}
+            href={detectionResult?.url_video && detectionResult.url_video !== "PREENCHER_LINK_OFICIAL" ? detectionResult.url_video : "#"}
             target="_blank"
             rel="noopener noreferrer"
             className="flex h-14 items-center gap-3 rounded-xl border border-border bg-background px-5 font-bold text-secondary hover:bg-muted transition"

@@ -3,8 +3,13 @@
 import React, { createContext, useContext, useState } from "react";
 
 export interface DetectionResult {
+  id: number;
   nome_peca: string;
+  codigo: string;
   confianca: number;
+  url_compra?: string;
+  url_video?: string;
+  url_foto_principal?: string;
 }
 
 interface DetectionContextType {
