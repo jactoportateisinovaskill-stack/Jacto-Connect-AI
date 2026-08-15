@@ -4,7 +4,12 @@ from pydantic import BaseModel
 # modelo de retorno das peças
 class DeteccaoPeca(BaseModel):
     nome_peca: str
+    codigo: str
     confianca: float
+    url_pasta_fotos: str
+    url_compra: str
+    url_video: str
+    url_foto_principal: str
 
 class PecaResponse(BaseModel):
     id: int

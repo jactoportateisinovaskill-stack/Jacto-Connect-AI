@@ -3,7 +3,7 @@ from typing import Optional
 
 class BaseRepository():
     def __init__(self, model: DeclarativeBase):
-        self.model = model
+        self.model: DeclarativeBase = model
 
     def get_all(self, db: Session) -> list[DeclarativeBase]:
         return db.query(self.model).all()
