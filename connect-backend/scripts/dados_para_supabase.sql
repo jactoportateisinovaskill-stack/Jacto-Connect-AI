@@ -308,9 +308,3 @@ SELECT pg_catalog.setval('public.peca_relacionada_id_seq', 133, true);
 SELECT pg_catalog.setval('public.pecas_id_seq', 40, true);
 
 
---
--- PostgreSQL database dump complete
---
-
-\unrestrict 2kOJeqEUwkeiEtL3xuguK8blEla3YurQwvDCHwpbXbSwQOneIvJPkBA0ypqaFm9
-
