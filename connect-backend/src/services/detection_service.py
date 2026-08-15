@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 import io
 
 from src.repository.peca_repository import PecaRepository
+from src.services.url_format import get_bucket_url
 
 model_path: str = "src/yolo_model/best.pt"
 model = YOLO(model_path)
@@ -30,6 +31,8 @@ def detectar_peca(image_bytes: bytes, db: Session) -> dict:
     if not peca:
         return None
 
+    url_foto_principal = get_bucket_url(peca.url_foto_principal)
+
     return {
         "nome_peca": peca.nome,
         "codigo": peca.codigo_jacto,
@@ -37,5 +40,5 @@ def detectar_peca(image_bytes: bytes, db: Session) -> dict:
         "url_pasta_fotos": peca.url_pasta_fotos,
         "url_compra": peca.url_compra,
         "url_video": peca.url_video,
-        "url_foto_principal": peca.url_foto_principal
+        "url_foto_principal": url_foto_principal
     }
