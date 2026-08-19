@@ -7,9 +7,6 @@ import { Wrench, Check, ArrowRight } from "lucide-react";
 import { Shell } from "@/components/jacto/Shell";
 import { useT } from "@/i18n";
 import { useEquipment, EMPTY_EQUIPMENT } from "@/lib/equipment";
-import sb20 from "@/assets/equip-sb20.png";
-import sb8 from "@/assets/equip-sb8.png";
-
 
 
 export default function EquipmentPage() {
@@ -29,8 +26,8 @@ export default function EquipmentPage() {
           const formatted = data.map((m: any) => ({
             id: m.modelo,
             name: m.nome,
-            tag: m.modelo, // ou usar a descrição/modelo real da API
-            img: m.url_imagem
+            tag: m.modelo,
+            img: m.url_imagem ? m.url_imagem : "/assets/no-image.svg"
           }));
           setMachines(formatted);
         } else {

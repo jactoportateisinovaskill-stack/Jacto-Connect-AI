@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 # modelo de retorno das peças
 class DeteccaoPeca(BaseModel):
+    id: int
     nome_peca: str
     codigo: str
     confianca: float
@@ -10,6 +11,7 @@ class DeteccaoPeca(BaseModel):
     url_compra: str
     url_video: str
     url_foto_principal: str
+    url_catalogo: str
 
 class PecaResponse(BaseModel):
     id: int

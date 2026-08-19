@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Câmera base -->
+  <path d="M 25 40 L 25 70 L 75 70 L 75 40 Z" fill="#000"/>
+  <path d="M 35 40 L 40 32 L 60 32 L 65 40 Z" fill="#000"/>
+  <!-- Lente externa -->
+  <circle cx="50" cy="55" r="12" fill="#fff"/>
+  <!-- Lente interna -->
+  <circle cx="50" cy="55" r="8" fill="#000"/>
+  
+  <!-- Círculo de proibição -->
+  <circle cx="50" cy="50" r="42" fill="none" stroke="#555" stroke-width="8"/>
+  <line x1="20" y1="20" x2="80" y2="80" stroke="#555" stroke-width="8"/>
+</svg>
