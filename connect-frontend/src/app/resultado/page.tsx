@@ -274,12 +274,12 @@ export default function Resultado() {
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold">
+              <a href="https://wa.me/5514981441403" target="_blank" rel="noopener noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold">
                 <MessageSquare className="h-4 w-4" /> {t("dist.whatsapp")}
               </a>
-              <button className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-white/10 text-white text-xs font-semibold">
+              <a href="https://jacto.com/brasil/garantia-jacto-portateis" target="_blank" rel="noopener noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-white/10 text-white text-xs font-semibold">
                 <MessageSquare className="h-4 w-4" /> {t("dist.openTicket")}
-              </button>
+              </a>
             </div>
           </div>
         </section>
