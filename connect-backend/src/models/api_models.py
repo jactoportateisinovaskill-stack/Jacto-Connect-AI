@@ -12,6 +12,7 @@ class DeteccaoPeca(BaseModel):
     url_video: str
     url_foto_principal: str
     url_catalogo: str
+    url_manual: str
 
 class PecaResponse(BaseModel):
     id: int

@@ -10,6 +10,8 @@ export interface DetectionResult {
   url_compra?: string;
   url_video?: string;
   url_foto_principal?: string;
+  url_catalogo?: string;
+  url_manual?: string;
 }
 
 interface DetectionContextType {

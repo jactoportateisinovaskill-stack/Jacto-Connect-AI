@@ -46,8 +46,6 @@ interface Related {
   compat: string;
 }
 
-// Removidas constantes estáticas: related e YOUTUBE_URL
-
 export default function Resultado() {
   const t = useT();
   const { locale } = useLocale();
@@ -241,6 +239,58 @@ export default function Resultado() {
                   ) : (
                     <div className="rounded-xl border border-border bg-muted flex items-center justify-center h-[20vh] text-sm text-muted-foreground font-medium">
                       {t("result.noCatalog")}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Manual */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="flex h-14 w-full items-center gap-3 rounded-xl border border-border bg-background px-5 font-bold text-secondary hover:bg-muted transition cursor-pointer">
+                <FileText className="h-5 w-5 text-primary" />
+                {t("result.manual")}
+                <ChevronRight className="ml-auto h-5 w-5" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl p-0 sm:max-w-md sm:mx-auto">
+              <SheetHeader className="px-5 pt-5 pb-2 text-left">
+                <SheetTitle className="text-lg font-extrabold text-secondary">
+                  {t("result.manual")}
+                </SheetTitle>
+                <SheetDescription className="text-xs text-muted-foreground">
+                  {t("result.manualDesc")}
+                </SheetDescription>
+              </SheetHeader>
+              <div className="max-h-[70vh] overflow-y-auto px-5 pb-6 pt-2 space-y-4">
+                {/* Código + nome */}
+                <div className="rounded-xl border border-border bg-card p-3">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-primary">
+                    <Tag className="h-3 w-3" /> {t("result.code")}: {detectedCode}
+                  </div>
+                  <div className="mt-1 font-extrabold text-secondary">
+                    {detectedName}
+                  </div>
+                </div>
+
+                {/* PDF do Manual */}
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-2">
+                    {t("result.manual")}
+                  </div>
+                  {detectionResult?.url_manual ? (
+                    <div className="rounded-xl border border-border bg-white overflow-hidden h-[50vh]">
+                      <iframe
+                        src={detectionResult.url_manual}
+                        title={t("result.manual")}
+                        className="w-full h-full border-0"
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-border bg-muted flex items-center justify-center h-[20vh] text-sm text-muted-foreground font-medium">
+                      {t("result.noManual")}
                     </div>
                   )}
                 </div>

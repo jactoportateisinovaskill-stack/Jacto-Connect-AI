@@ -16,6 +16,7 @@ def get_db_detection(detection: dict, db: Session) -> dict:
 
     url_foto_principal = get_bucket_url(peca.url_foto_principal)
     url_catalogo = get_pdf_url("Catalogo_Pecas.pdf")
+    url_manual = get_pdf_url("Manual_Usuario.pdf")
 
     return {
         "id": peca.id,
@@ -26,5 +27,6 @@ def get_db_detection(detection: dict, db: Session) -> dict:
         "url_compra": peca.url_compra,
         "url_video": peca.url_video,
         "url_foto_principal": url_foto_principal,
-        "url_catalogo": url_catalogo
+        "url_catalogo": url_catalogo,
+        "url_manual": url_manual
     }
