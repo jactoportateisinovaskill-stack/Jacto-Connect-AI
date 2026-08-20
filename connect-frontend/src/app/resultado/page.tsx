@@ -94,7 +94,7 @@ export default function Resultado() {
     });
   };
 
-  const detectedName = detectionResult?.nome_peca || "Peça não identificada";
+  const detectedName = detectionResult?.nome_peca || t("result.notFound");
   const detectedCode = detectionResult?.codigo || "N/A";
 
   const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 0;
@@ -109,7 +109,7 @@ export default function Resultado() {
             {detectionResult?.id ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />} {confidencePercent}%
           </div>
           <div className="absolute top-2 right-2 rounded-full bg-black/50 backdrop-blur px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
-            {detectionResult?.id ? t("compat.identified") : "Não Encontrada"}
+            {detectionResult?.id ? t("compat.identified") : t("result.notFound")}
           </div>
         </div>
 
@@ -123,7 +123,7 @@ export default function Resultado() {
           </h2>
           <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
             <Tractor className="h-4 w-4 text-secondary" />
-            {t("result.usage")} <span className="font-semibold text-secondary">{stored?.modelo ? `Jacto ${stored.modelo}` : "Jacto (Desconhecido)"}</span>
+            {t("result.usage")} <span className="font-semibold text-secondary">{stored?.modelo ? `Jacto ${stored.modelo}` : `Jacto (${t("result.unknown")})`}</span>
           </div>
         </div>
 
@@ -165,7 +165,7 @@ export default function Resultado() {
               </SheetHeader>
               <ul className="max-h-[60vh] overflow-y-auto px-5 pb-6 pt-2 space-y-2">
                 {relatedParts.length === 0 ? (
-                  <div className="text-center text-sm text-muted-foreground mt-4">Nenhuma peça relacionada encontrada.</div>
+                  <div className="text-center text-sm text-muted-foreground mt-4">{t("result.noRelated")}</div>
                 ) : relatedParts.map((r) => (
                   <li
                     key={r.code}
@@ -235,7 +235,7 @@ export default function Resultado() {
                     </div>
                   ) : (
                     <div className="rounded-xl border border-border bg-muted flex items-center justify-center h-[20vh] text-sm text-muted-foreground font-medium">
-                      O catálogo em PDF não está disponível no momento.
+                      {t("result.noCatalog")}
                     </div>
                   )}
                 </div>

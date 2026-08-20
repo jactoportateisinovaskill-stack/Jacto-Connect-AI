@@ -73,9 +73,9 @@ export default function EquipmentPage() {
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
           {loading ? (
-            <div className="col-span-full text-center text-sm text-muted-foreground py-4">Carregando equipamentos...</div>
+            <div className="col-span-full text-center text-sm text-muted-foreground py-4">{t("equipment.loading")}</div>
           ) : machines.length === 0 ? (
-            <div className="col-span-full text-center text-sm text-muted-foreground py-4">Nenhum equipamento encontrado.</div>
+            <div className="col-span-full text-center text-sm text-muted-foreground py-4">{t("equipment.empty")}</div>
           ) : machines.map((m) => {
             const active = selected === m.id;
             return (

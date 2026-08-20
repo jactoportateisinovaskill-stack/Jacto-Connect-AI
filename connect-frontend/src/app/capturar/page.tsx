@@ -44,7 +44,7 @@ export default function Capturar() {
       }
     } catch (err: any) {
       console.error("Erro ao acessar a câmera:", err);
-      setCameraError(err.message || "Permissão de câmera negada ou dispositivo não encontrado.");
+      setCameraError(err.message || "default");
     }
   }, []);
 
@@ -128,13 +128,13 @@ export default function Capturar() {
           ) : cameraError ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
               <AlertCircle className="h-10 w-10 text-destructive mb-3" />
-              <p className="text-sm font-semibold text-white mb-2">Erro de Câmera</p>
-              <p className="text-xs text-white/60 mb-4">{cameraError}</p>
+              <p className="text-sm font-semibold text-white mb-2">{t("capture.camErrorTitle")}</p>
+              <p className="text-xs text-white/60 mb-4">{cameraError === "default" ? t("capture.camErrorDesc") : cameraError}</p>
               <button 
                 onClick={startCamera}
                 className="rounded-lg bg-white/10 px-4 py-2 text-xs font-semibold text-white hover:bg-white/20 transition"
               >
-                Tentar Novamente
+                {t("capture.tryAgain")}
               </button>
             </div>
           ) : (
@@ -178,7 +178,7 @@ export default function Capturar() {
 
           <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
             <span className={`h-1.5 w-1.5 rounded-full ${preview ? 'bg-primary' : cameraError ? 'bg-destructive' : stream ? 'bg-success animate-pulse' : 'bg-primary animate-pulse'}`} />
-            {preview ? t("capture.galleryImg") : cameraError ? "Erro" : t("capture.camActive")}
+            {preview ? t("capture.galleryImg") : cameraError ? t("capture.error") : t("capture.camActive")}
           </div>
 
           {preview && (
