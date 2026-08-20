@@ -24,7 +24,8 @@ import {
   Shield,
   Check,
 } from "lucide-react";
-import { useT } from "@/i18n";
+import { useT, useLocale } from "@/i18n";
+import { getTranslatedPartName } from "@/lib/parts-translations";
 
 import { Shell } from "@/components/jacto/Shell";
 import {
@@ -49,6 +50,7 @@ interface Related {
 
 export default function Resultado() {
   const t = useT();
+  const { locale } = useLocale();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -74,7 +76,7 @@ export default function Resultado() {
           if (!p) return null;
           return {
             code: p.codigo_jacto,
-            name: p.nome,
+            name: getTranslatedPartName(p.codigo_jacto, p.nome, locale),
             compat: "Compatível"
           };
         }).filter(Boolean);
@@ -84,7 +86,7 @@ export default function Resultado() {
       console.error("Erro ao buscar peças relacionadas:", err);
       setRelatedParts([]);
     });
-  }, [detectionResult?.id]);
+  }, [detectionResult?.id, locale]);
 
   const submitRating = () => {
     if (rating === 0 || submitted) return;
@@ -94,8 +96,11 @@ export default function Resultado() {
     });
   };
 
-  const detectedName = detectionResult?.nome_peca || t("result.notFound");
   const detectedCode = detectionResult?.codigo || "N/A";
+  const detectedNameOriginal = detectionResult?.nome_peca;
+  const detectedName = detectedNameOriginal
+    ? getTranslatedPartName(detectedCode, detectedNameOriginal, locale)
+    : t("result.notFound");
 
   const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 0;
 
