@@ -11,7 +11,7 @@ from src.models.database_models import (
     Observacoes, Historico, Maquinas
 )
 
-from src.services.url_format import get_maquina_url
+from src.services.url_service import get_maquina_url
 
 from src.repository.base_repository import BaseRepository
 
