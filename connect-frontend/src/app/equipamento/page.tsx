@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Wrench, Check, ArrowRight } from "lucide-react";
 import { Shell } from "@/components/jacto/Shell";
-import { useT } from "@/i18n";
+import { useT, useLocale } from "@/i18n";
 import { useEquipment, EMPTY_EQUIPMENT } from "@/lib/equipment";
+import { getTranslatedMachineName } from "@/lib/parts-translations";
 
 
 export default function EquipmentPage() {
   const t = useT();
+  const { locale } = useLocale();
   const router = useRouter();
   const [stored, save] = useEquipment();
   const [selected, setSelected] = useState<string>(stored?.modelo || "");
@@ -25,7 +27,7 @@ export default function EquipmentPage() {
         if (data && data.length > 0) {
           const formatted = data.map((m: any) => ({
             id: m.modelo,
-            name: m.nome,
+            name: getTranslatedMachineName(m.nome, locale),
             tag: m.modelo,
             img: m.url_imagem ? m.url_imagem : "/assets/no-image.svg"
           }));
@@ -44,7 +46,7 @@ export default function EquipmentPage() {
     function getFallbackModels() {
       return [];
     }
-  }, [t]);
+  }, [t, locale]);
 
   const current = machines.find((m) => m.id === selected);
 

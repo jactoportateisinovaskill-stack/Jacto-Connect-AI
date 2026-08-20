@@ -47,3 +47,15 @@ export function getTranslatedPartName(code: string, originalName: string, locale
   if (!t) return originalName;
   return t[locale] || originalName;
 }
+
+const machineTranslations: Record<string, Record<string, string>> = {
+  "Pulverizador Costal Elétrico": { en: "Battery Backpack Sprayer", es: "Pulverizador de mochila a batería" },
+  "Pulverizador Costal a bateria": { en: "Battery Backpack Sprayer", es: "Pulverizador de mochila a batería" },
+};
+
+export function getTranslatedMachineName(originalName: string, locale: string): string {
+  if (locale === "pt") return originalName;
+  const t = machineTranslations[originalName];
+  if (!t) return originalName;
+  return t[locale] || originalName;
+}
