@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from src.repository.peca_repository import PecaRepository
-from src.services.url_format import get_bucket_url, get_pdf_url
+from src.services.url_service import get_bucket_url, get_pdf_url
 
 peca_repository: PecaRepository = PecaRepository()
 
