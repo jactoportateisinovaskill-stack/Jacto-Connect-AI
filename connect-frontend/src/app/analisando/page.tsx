@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ScanLine, Cpu, Sparkles, CheckCircle2 } from "lucide-react";
 import { useT } from "@/i18n";
@@ -20,18 +20,33 @@ export default function Analisando() {
   const { imageFile, setDetectionResult } = useDetection();
   const isDoneRef = useRef(false);
 
+  const previewUrl = useMemo(() => {
+    return imageFile ? URL.createObjectURL(imageFile) : null;
+  }, [imageFile]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   useEffect(() => {
     const tTimer = setInterval(() => {
       setPct((p) => {
-        if (p >= 90 && !isDoneRef.current) {
-          return 90;
+        if (isDoneRef.current) {
+          if (p >= 100) {
+            clearInterval(tTimer);
+            setTimeout(() => router.push("/resultado"), 200);
+            return 100;
+          }
+          return Math.min(100, p + 10);
         }
-        if (p >= 100) {
-          clearInterval(tTimer);
-          setTimeout(() => router.push("/resultado"), 120);
-          return 100;
-        }
-        return p + 5;
+        
+        // Antes da API responder, o progresso sobe cada vez mais devagar
+        if (p < 60) return p + 5;
+        if (p < 85) return p + 2;
+        if (p < 98) return p + 0.5;
+        return p;
       });
     }, 100);
     return () => clearInterval(tTimer);
@@ -60,7 +75,6 @@ export default function Analisando() {
         toast.error("Erro na análise. Usando dados padrão.");
       } finally {
         isDoneRef.current = true;
-        setPct(100);
       }
     }
     upload();
@@ -71,9 +85,13 @@ export default function Analisando() {
   return (
     <Shell back="/capturar" title={t("analyzing.title")}>
       <div className="relative mt-4 mx-auto aspect-square w-44 overflow-hidden rounded-2xl bg-secondary shadow-[var(--shadow-card)]">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="h-28 w-20 rounded-[40%] bg-gradient-to-b from-zinc-400 to-zinc-600 rotate-12" />
-        </div>
+        {previewUrl ? (
+          <img src={previewUrl} alt="Peça analisada" className="h-full w-full object-cover" />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-28 w-20 rounded-[40%] bg-gradient-to-b from-zinc-400 to-zinc-600 rotate-12" />
+          </div>
+        )}
         <div className="absolute inset-x-0 top-0 h-1 bg-primary animate-scan" />
         <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
       </div>
@@ -86,7 +104,7 @@ export default function Analisando() {
       <div className="mt-8">
         <div className="flex items-end justify-between mb-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t("analyzing.progress")}</span>
-          <span className="text-2xl font-extrabold text-secondary tabular-nums">{pct}%</span>
+          <span className="text-2xl font-extrabold text-secondary tabular-nums">{Math.floor(pct)}%</span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
           <div className="h-full rounded-full bg-primary transition-all duration-100" style={{ width: `${pct}%` }} />

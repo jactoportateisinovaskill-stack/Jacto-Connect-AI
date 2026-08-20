@@ -1,28 +1,52 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Wrench, Check, ArrowRight } from "lucide-react";
 import { Shell } from "@/components/jacto/Shell";
 import { useT } from "@/i18n";
 import { useEquipment, EMPTY_EQUIPMENT } from "@/lib/equipment";
-import sb20 from "@/assets/equip-sb20.png";
-import sb8 from "@/assets/equip-sb8.png";
-
 
 
 export default function EquipmentPage() {
   const t = useT();
-  const MODELS = [
-    { id: "SB-20", name: "SB-20", tag: t("equipment.tagSb20"), img: sb20 },
-    { id: "SB-8", name: "SB-8", tag: t("equipment.tagSb8"), img: sb8 },
-  ];
   const router = useRouter();
   const [stored, save] = useEquipment();
   const [selected, setSelected] = useState<string>(stored?.modelo || "");
+  const [machines, setMachines] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const current = MODELS.find((m) => m.id === selected);
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/database/maquinas")
+      .then(res => res.json())
+      .then(data => {
+        // Se a API retornar um array vazio, usa o fallback, senão mapeia os dados do backend
+        if (data && data.length > 0) {
+          const formatted = data.map((m: any) => ({
+            id: m.modelo,
+            name: m.nome,
+            tag: m.modelo,
+            img: m.url_imagem ? m.url_imagem : "/assets/no-image.svg"
+          }));
+          setMachines(formatted);
+        } else {
+          setMachines(getFallbackModels());
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Erro ao carregar máquinas do backend:", err);
+        setMachines(getFallbackModels());
+        setLoading(false);
+      });
+      
+    function getFallbackModels() {
+      return [];
+    }
+  }, [t]);
+
+  const current = machines.find((m) => m.id === selected);
 
   const confirm = () => {
     if (!selected) return;
@@ -48,7 +72,11 @@ export default function EquipmentPage() {
         </div>
 
         <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {MODELS.map((m) => {
+          {loading ? (
+            <div className="col-span-full text-center text-sm text-muted-foreground py-4">{t("equipment.loading")}</div>
+          ) : machines.length === 0 ? (
+            <div className="col-span-full text-center text-sm text-muted-foreground py-4">{t("equipment.empty")}</div>
+          ) : machines.map((m) => {
             const active = selected === m.id;
             return (
               <button
@@ -62,13 +90,17 @@ export default function EquipmentPage() {
                 }`}
               >
                 <div className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg bg-white p-3">
-                  <Image
-                    src={m.img}
-                    alt={`Equipamento ${m.name}`}
-                    width={1024}
-                    height={1024}
-                    className="h-full w-full object-contain transition group-hover:scale-105"
-                  />
+                  {typeof m.img === 'string' ? (
+                    <img src={m.img} alt={`Equipamento ${m.name}`} className="h-full w-full object-contain transition group-hover:scale-105" />
+                  ) : (
+                    <Image
+                      src={m.img}
+                      alt={`Equipamento ${m.name}`}
+                      width={1024}
+                      height={1024}
+                      className="h-full w-full object-contain transition group-hover:scale-105"
+                    />
+                  )}
                 </div>
                 <div className="mt-2 flex items-start justify-between gap-1">
                   <div className="min-w-0">
@@ -88,13 +120,17 @@ export default function EquipmentPage() {
 
         {current && (
           <div className="mt-6 flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3">
-            <Image
-              src={current.img}
-              alt=""
-              width={64}
-              height={64}
-              className="h-14 w-14 rounded-lg bg-white object-contain p-1"
-            />
+            {typeof current.img === 'string' ? (
+              <img src={current.img} alt="" className="h-14 w-14 rounded-lg bg-white object-contain p-1" />
+            ) : (
+              <Image
+                src={current.img}
+                alt=""
+                width={64}
+                height={64}
+                className="h-14 w-14 rounded-lg bg-white object-contain p-1"
+              />
+            )}
             <div className="min-w-0 flex-1">
               <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">
                 {t("equipment.selectedModel")}

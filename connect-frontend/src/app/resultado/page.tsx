@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   CheckCircle2,
+  XCircle,
   Layers,
   Tag,
   Tractor,
@@ -23,8 +24,8 @@ import {
   Shield,
   Check,
 } from "lucide-react";
-import { useT } from "@/i18n";
-import explodedJd12 from "@/assets/exploded-jd12.jpg";
+import { useT, useLocale } from "@/i18n";
+import { getTranslatedPartName } from "@/lib/parts-translations";
 
 import { Shell } from "@/components/jacto/Shell";
 import {
@@ -37,6 +38,7 @@ import {
 } from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { useDetection } from "@/lib/DetectionContext";
+import { useEquipment } from "@/lib/equipment";
 
 interface Related {
   code: string;
@@ -44,26 +46,47 @@ interface Related {
   compat: string;
 }
 
-const related: Related[] = [
-  { code: "1168546", name: "Capa do bico JD-12", compat: "Bico JD-12 / SB-20B" },
-  { code: "999142", name: "Anel de vedação O-ring do bico", compat: "Bico JD-12 / SB-20B" },
-  { code: "999158", name: "Junta de vedação do porta-bico", compat: "Bico JD-12 / SB-20B" },
-  { code: "1168545", name: "Filtro do bico M50/60", compat: "Bico JD-12 / SB-20B" },
-  { code: "323456", name: "Tampa do reservatório SB-20B", compat: "Pulverizador SB-20B" },
-  { code: "323478", name: "Vedação da tampa do reservatório", compat: "Pulverizador SB-20B" },
-  { code: "445221", name: "Diafragma do registro LP 601", compat: "Registro / SB-20B" },
-  { code: "1217605", name: "Kit de reparo do registro LP 601", compat: "Registro / SB-20B" },
-];
-
-const YOUTUBE_URL =
-  "https://www.youtube.com/results?search_query=manuten%C3%A7%C3%A3o+Jacto+SB20";
+// Removidas constantes estáticas: related e YOUTUBE_URL
 
 export default function Resultado() {
   const t = useT();
+  const { locale } = useLocale();
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const { detectionResult } = useDetection();
+  const [stored] = useEquipment();
+  const [relatedParts, setRelatedParts] = useState<Related[]>([]);
+
+  const imageUrl = (detectionResult?.url_foto_principal && !detectionResult.url_foto_principal.endsWith("None"))
+    ? detectionResult.url_foto_principal
+    : "/assets/no-image.svg";
+
+  useEffect(() => {
+    if (!detectionResult?.id) return;
+
+    Promise.all([
+      fetch("http://127.0.0.1:8000/api/database/pecas").then(r => r.json()),
+      fetch("http://127.0.0.1:8000/api/database/peca-relacionada").then(r => r.json())
+    ]).then(([parts, relations]) => {
+      if (Array.isArray(parts) && Array.isArray(relations)) {
+        const myRelations = relations.filter((r: any) => r.peca_id === detectionResult.id);
+        const mapped = myRelations.map((rel: any) => {
+          const p = parts.find((p: any) => p.id === rel.peca_relacionada_id);
+          if (!p) return null;
+          return {
+            code: p.codigo_jacto,
+            name: getTranslatedPartName(p.codigo_jacto, p.nome, locale),
+            compat: "Compatível"
+          };
+        }).filter(Boolean);
+        setRelatedParts(mapped);
+      }
+    }).catch(err => {
+      console.error("Erro ao buscar peças relacionadas:", err);
+      setRelatedParts([]);
+    });
+  }, [detectionResult?.id, locale]);
 
   const submitRating = () => {
     if (rating === 0 || submitted) return;
@@ -73,26 +96,25 @@ export default function Resultado() {
     });
   };
 
-  const rawName = detectionResult?.nome_peca || "Bico Completo JD-12 - 427062";
-  const parts = rawName.split("-");
-  const detectedName = parts[0]?.trim();
-  const detectedCode = parts.length > 1 ? parts[1]?.trim() : (detectionResult ? "N/A" : "427062");
+  const detectedCode = detectionResult?.codigo || "N/A";
+  const detectedNameOriginal = detectionResult?.nome_peca;
+  const detectedName = detectedNameOriginal
+    ? getTranslatedPartName(detectedCode, detectedNameOriginal, locale)
+    : t("result.notFound");
 
-  const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 94;
+  const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 0;
 
   return (
     <Shell back="/capturar" title={t("result.title")}>
       <div className="mt-2 animate-slide-up">
         {/* Hero image */}
         <div className="relative mx-auto w-full max-w-[260px] overflow-hidden rounded-2xl bg-secondary shadow-[var(--shadow-card)]">
-          <div className="aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-zinc-700 to-zinc-900">
-            <div className="h-24 w-16 rounded-[40%] bg-gradient-to-b from-zinc-300 via-zinc-400 to-zinc-600 rotate-12 shadow-2xl" />
-          </div>
-          <div className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-success px-2 py-1 text-[10px] font-extrabold text-success-foreground shadow-md">
-            <CheckCircle2 className="h-3 w-3" /> {confidencePercent}%
+          <img src={imageUrl} alt="Foto oficial da peça" className="w-full aspect-[4/3] object-cover bg-white" />
+          <div className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-extrabold shadow-md ${detectionResult?.id ? 'bg-success text-success-foreground' : 'bg-red-500 text-white'}`}>
+            {detectionResult?.id ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />} {confidencePercent}%
           </div>
           <div className="absolute top-2 right-2 rounded-full bg-black/50 backdrop-blur px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
-            {t("compat.identified")}
+            {detectionResult?.id ? t("compat.identified") : t("result.notFound")}
           </div>
         </div>
 
@@ -106,7 +128,7 @@ export default function Resultado() {
           </h2>
           <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
             <Tractor className="h-4 w-4 text-secondary" />
-            {t("result.usage")} <span className="font-semibold text-secondary">Jacto SB-20B</span>
+            {t("result.usage")} <span className="font-semibold text-secondary">{stored?.modelo ? `Jacto ${stored.modelo}` : `Jacto (${t("result.unknown")})`}</span>
           </div>
         </div>
 
@@ -114,7 +136,7 @@ export default function Resultado() {
         <div className="mt-4 space-y-3">
           {/* {t("result.buyTitle")} — destaque */}
           <a
-            href="https://www.jacto.com.br/pt/pecas-e-servicos"
+            href={detectionResult?.url_compra && detectionResult.url_compra !== "PREENCHER_LINK_OFICIAL" ? detectionResult.url_compra : "#"}
             target="_blank"
             rel="noopener noreferrer"
             className="relative flex h-16 w-full items-center gap-3 rounded-xl bg-gradient-to-r from-primary to-primary/80 px-5 font-extrabold text-primary-foreground shadow-[var(--shadow-glow)] ring-2 ring-primary/30 ring-offset-2 ring-offset-background active:scale-[0.98] transition"
@@ -147,7 +169,9 @@ export default function Resultado() {
                 </SheetDescription>
               </SheetHeader>
               <ul className="max-h-[60vh] overflow-y-auto px-5 pb-6 pt-2 space-y-2">
-                {related.map((r) => (
+                {relatedParts.length === 0 ? (
+                  <div className="text-center text-sm text-muted-foreground mt-4">{t("result.noRelated")}</div>
+                ) : relatedParts.map((r) => (
                   <li
                     key={r.code}
                     className="rounded-xl border border-border bg-card p-3 shadow-[var(--shadow-card)]"
@@ -164,7 +188,7 @@ export default function Resultado() {
                     </div>
                     <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold text-secondary">
                       <CheckCircle2 className="h-3 w-3 text-success" />
-                      {t("result.compatible")}: {r.compat}
+                      {t("result.compatible")}
                     </div>
                   </li>
                 ))}
@@ -194,58 +218,38 @@ export default function Resultado() {
                 {/* Código + nome */}
                 <div className="rounded-xl border border-border bg-card p-3">
                   <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-primary">
-                    <Tag className="h-3 w-3" /> {t("result.code")}: 427062
+                    <Tag className="h-3 w-3" /> {t("result.code")}: {detectedCode}
                   </div>
                   <div className="mt-1 font-extrabold text-secondary">
-                    Bico Completo JD-12
+                    {detectedName}
                   </div>
                 </div>
 
-                {/* {t("result.explodedView")} */}
+                {/* PDF do Catálogo */}
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-2">
-                    {t("result.explodedView")}
+                    {t("result.catalog")}
                   </div>
-                  <div className="rounded-xl border border-border bg-white overflow-hidden">
-                    <Image
-                      src={explodedJd12}
-                      alt={`${t("result.explodedView")} do Bico Completo JD-12`}
-                      width={1024}
-                      height={1024}
-                      className="w-full h-auto object-contain"
-                    />
-                  </div>
-                </div>
-
-                {/* {t("result.techInfo")} */}
-                <div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-2">
-                    {t("result.techInfo")}
-                  </div>
-                  <dl className="rounded-xl border border-border bg-card divide-y divide-border text-sm">
-                    {[
-                      [t("result.category"), "Bico de pulverização"],
-                      [t("result.mat"), "Polímero técnico + cerâmica"],
-                      [t("result.flow"), "1,2 L/min @ 3 bar"],
-                      [t("result.pressure"), "1 – 5 bar"],
-                      [t("result.angle"), "110°"],
-                      [t("result.thread"), "M11 x 1"],
-                      [t("result.weight"), "38 g"],
-                      ["Compatibilidade", "SB-20B, SB-B, SB20 Linha M"],
-                    ].map(([k, v]) => (
-                      <div key={k} className="flex items-start justify-between gap-3 px-3 py-2">
-                        <dt className="text-xs font-semibold text-muted-foreground">{k}</dt>
-                        <dd className="text-right font-semibold text-secondary">{v}</dd>
-                      </div>
-                    ))}
-                  </dl>
+                  {detectionResult?.url_catalogo ? (
+                    <div className="rounded-xl border border-border bg-white overflow-hidden h-[50vh]">
+                      <iframe
+                        src={detectionResult.url_catalogo}
+                        title="Catálogo de Peças"
+                        className="w-full h-full border-0"
+                      />
+                    </div>
+                  ) : (
+                    <div className="rounded-xl border border-border bg-muted flex items-center justify-center h-[20vh] text-sm text-muted-foreground font-medium">
+                      {t("result.noCatalog")}
+                    </div>
+                  )}
                 </div>
               </div>
             </SheetContent>
           </Sheet>
 
           <a
-            href={YOUTUBE_URL}
+            href={detectionResult?.url_video && detectionResult.url_video !== "PREENCHER_LINK_OFICIAL" ? detectionResult.url_video : "#"}
             target="_blank"
             rel="noopener noreferrer"
             className="flex h-14 items-center gap-3 rounded-xl border border-border bg-background px-5 font-bold text-secondary hover:bg-muted transition"
@@ -275,12 +279,12 @@ export default function Resultado() {
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <a href="https://wa.me/5511999999999" target="_blank" rel="noopener noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold">
+              <a href="https://wa.me/5514981441403" target="_blank" rel="noopener noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold">
                 <MessageSquare className="h-4 w-4" /> {t("dist.whatsapp")}
               </a>
-              <button className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-white/10 text-white text-xs font-semibold">
+              <a href="https://jacto.com/brasil/garantia-jacto-portateis" target="_blank" rel="noopener noreferrer" className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-white/10 text-white text-xs font-semibold">
                 <MessageSquare className="h-4 w-4" /> {t("dist.openTicket")}
-              </button>
+              </a>
             </div>
           </div>
         </section>

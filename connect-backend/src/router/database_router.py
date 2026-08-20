@@ -11,6 +11,8 @@ from src.models.database_models import (
     Observacoes, Historico, Maquinas
 )
 
+from src.services.url_format import get_maquina_url
+
 from src.repository.base_repository import BaseRepository
 
 from src.database.database_dependencies import get_db
@@ -40,14 +42,27 @@ async def get_peca_id(peca_id: int, db: Session = Depends(get_db)):
 
 @router.get("/maquinas", response_model=list[MaquinaResponse])
 async def get_all_maquinas(db: Session = Depends(get_db)):
-    return maquinas_repository.get_all(db)
+    maquinas = maquinas_repository.get_all(db)
+    return [
+        MaquinaResponse(
+            id=m.id,
+            nome=m.nome,
+            modelo=m.modelo,
+            url_imagem=get_maquina_url(m.url_imagem) if m.url_imagem else ""
+        ) for m in maquinas
+    ]
 
 @router.get("/maquinas/{maquina_id}", response_model=MaquinaResponse)
 async def get_maquina_id(maquina_id: int, db: Session = Depends(get_db)):
     maquina = maquinas_repository.get_by_id(db, maquina_id)
     if not maquina:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Maquina não encontrada")
-    return maquina
+    return MaquinaResponse(
+        id=maquina.id,
+        nome=maquina.nome,
+        modelo=maquina.modelo,
+        url_imagem=get_maquina_url(maquina.url_imagem) if maquina.url_imagem else ""
+    )
 
 
 @router.get("/historicos", response_model=list[HistoricoResponse])
