@@ -54,6 +54,7 @@ export default function Analisando() {
 
   useEffect(() => {
     async function upload() {
+      setDetectionResult(null);
       if (!imageFile) {
         isDoneRef.current = true;
         return;
