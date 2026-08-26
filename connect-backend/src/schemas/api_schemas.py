@@ -52,3 +52,11 @@ class PecaRelacionadaResponse(BaseModel):
     id: int
     peca_id: int
     peca_relacionada_id: int
+
+
+class HistoricoCreate(BaseModel):
+    maquina_id: int
+    peca_identificada_id: int
+    url_foto_client: str
+    confianca_ia: float
+    status: str

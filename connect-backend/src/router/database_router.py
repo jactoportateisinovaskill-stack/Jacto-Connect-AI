@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 
 from src.schemas.api_schemas import (
     PecaResponse, MaquinaResponse, HistoricoResponse,
-    AvaliacoesResponse, ObservacoesResponse, PecaRelacionadaResponse 
+    AvaliacoesResponse, ObservacoesResponse, PecaRelacionadaResponse,
+    HistoricoCreate,
 )
 
 from src.schemas.database_schemas import (
@@ -105,9 +106,41 @@ async def get_observacao_id(observacao_id: int, db: Session = Depends(get_db)):
 async def get_all_pecas(db: Session = Depends(get_db)):
     return peca_relacionada_repository.get_all(db)
 
-@router.get("/peca-relacionada/{peca_id}", response_model=PecaRelacionadaResponse)
-async def get_peca_id(peca_id: int, db: Session = Depends(get_db)):
-    peca = peca_relacionada_repository.get_by_id(db, peca_id)
-    if not peca:
+@router.get("/peca-relacionada/{relacao_id}", response_model=PecaRelacionadaResponse)
+async def get_peca_relacionada_id(relacao_id: int, db: Session = Depends(get_db)):
+    relacao = peca_relacionada_repository.get_by_id(db, relacao_id)
+    if not relacao:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Peça relacionada não encontrada")
-    return peca
+    return relacao
+
+
+@router.post("/historicos",
+             response_model=MaquinaResponse,
+             status_code=status.HTTP_201_CREATED)
+async def post_historico(entity: HistoricoCreate, db: Session = Depends(get_db)):
+
+    maquina = maquinas_repository.get_by_id(
+        db,
+        entity.maquina_id
+    )
+
+    if not maquina:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Máquina não encontrada"
+        )
+
+    peca = pecas_repository.get_by_id(
+        db,
+        entity.peca_identificada_id
+    )
+
+    if not peca:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Peça não encontrada"
+        )
+    
+    return historicos_repository.create(
+        entity=entity,
+        db=db)
