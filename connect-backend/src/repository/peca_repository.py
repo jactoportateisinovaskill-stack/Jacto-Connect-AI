@@ -2,7 +2,7 @@ from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import DeclarativeBase, Session
-from src.models.database_models import Pecas
+from src.schemas.database_schemas import Pecas
 from src.repository.base_repository import BaseRepository
 
 class PecaRepository(BaseRepository):

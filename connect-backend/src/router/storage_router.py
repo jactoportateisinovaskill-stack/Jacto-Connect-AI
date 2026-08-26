@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, File, UploadFile
-from src.models.storage_schemas import BucketCreateRequest
+from src.schemas.storage_schemas import BucketCreateRequest
 from src.services.storage_service import StorageService
 
 router = APIRouter()

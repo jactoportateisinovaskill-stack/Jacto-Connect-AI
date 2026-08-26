@@ -14,7 +14,6 @@ class Pecas(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     codigo_jacto: Mapped[str]
     nome: Mapped[str]
-    url_pasta_fotos: Mapped[str]
     url_compra: Mapped[str]
     url_video: Mapped[str]
     ativo: Mapped[bool]

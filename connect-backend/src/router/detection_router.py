@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, status
 from sqlalchemy.orm import Session
 from src.services.detection_service import detectar_peca
 from src.services.get_db_detection_service import get_db_detection
-from src.models.api_models import DeteccaoPeca
+from src.schemas.api_schemas import DeteccaoPeca
 from src.database.database_dependencies import get_db
 
 router: APIRouter = APIRouter(prefix="/api/detection")

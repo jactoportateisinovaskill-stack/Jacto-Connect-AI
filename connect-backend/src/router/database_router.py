@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from src.models.api_models import (
+from src.schemas.api_schemas import (
     PecaResponse, MaquinaResponse, HistoricoResponse,
     AvaliacoesResponse, ObservacoesResponse, PecaRelacionadaResponse 
 )
 
-from src.models.database_models import (
+from src.schemas.database_schemas import (
     Pecas, PecaRelacionada, Avaliacoes,
     Observacoes, Historico, Maquinas
 )
