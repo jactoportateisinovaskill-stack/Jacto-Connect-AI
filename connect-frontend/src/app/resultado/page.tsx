@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   CheckCircle2,
   XCircle,
@@ -23,6 +24,7 @@ import {
   Wrench,
   Shield,
   Check,
+  AlertCircle,
 } from "lucide-react";
 import { useT, useLocale } from "@/i18n";
 import { getTranslatedPartName } from "@/lib/parts-translations";
@@ -52,6 +54,7 @@ export default function Resultado() {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const router = useRouter();
   const { detectionResult } = useDetection();
   const [stored] = useEquipment();
   const [relatedParts, setRelatedParts] = useState<Related[]>([]);
@@ -115,6 +118,24 @@ export default function Resultado() {
             {detectionResult?.id ? t("compat.identified") : t("result.notFound")}
           </div>
         </div>
+
+        {/* Low Confidence Warning */}
+        {detectionResult?.id && confidencePercent < 80 && (
+          <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 p-5 text-center shadow-[var(--shadow-card)]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/20">
+              <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
+              A confiança da identificação está baixa ({confidencePercent}%). Recomendamos capturar a peça novamente em um local mais iluminado e com fundo neutro.
+            </p>
+            <button
+              onClick={() => router.push("/capturar")}
+              className="mt-1 flex h-10 items-center justify-center rounded-xl bg-yellow-500 px-6 text-xs font-extrabold text-white transition hover:bg-yellow-400 active:scale-95"
+            >
+              Capturar Novamente
+            </button>
+          </div>
+        )}
 
         {/* Identified card */}
         <div className="mt-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)]">

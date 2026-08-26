@@ -23,7 +23,6 @@ def get_db_detection(detection: dict, db: Session) -> dict:
         "nome_peca": peca.nome,
         "codigo": peca.codigo_jacto,
         "confianca": confianca,
-        "url_pasta_fotos": peca.url_pasta_fotos,
         "url_compra": peca.url_compra,
         "url_video": peca.url_video,
         "url_foto_principal": url_foto_principal,
