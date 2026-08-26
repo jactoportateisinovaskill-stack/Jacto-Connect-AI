@@ -36,7 +36,7 @@ export default function Analisando() {
         if (isDoneRef.current) {
           if (p >= 100) {
             clearInterval(tTimer);
-            setTimeout(() => router.push("/resultado"), 200);
+            setTimeout(() => router.push("/conferencia"), 200);
             return 100;
           }
           return Math.min(100, p + 10);
