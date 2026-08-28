@@ -120,19 +120,19 @@ export default function Resultado() {
         </div>
 
         {/* Low Confidence Warning */}
-        {detectionResult?.id && confidencePercent < 80 && (
+        {confidencePercent < 80 && (
           <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 p-5 text-center shadow-[var(--shadow-card)]">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/20">
               <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
             </div>
             <p className="text-sm font-semibold text-yellow-700 dark:text-yellow-300">
-              A confiança da identificação está baixa ({confidencePercent}%). Recomendamos capturar a peça novamente em um local mais iluminado e com fundo neutro.
+              {t("result.lowConfWarning1")}{confidencePercent}{t("result.lowConfWarning2")}
             </p>
             <button
               onClick={() => router.push("/capturar")}
               className="mt-1 flex h-10 items-center justify-center rounded-xl bg-yellow-500 px-6 text-xs font-extrabold text-white transition hover:bg-yellow-400 active:scale-95"
             >
-              Capturar Novamente
+              {t("result.captureAgain")}
             </button>
           </div>
         )}

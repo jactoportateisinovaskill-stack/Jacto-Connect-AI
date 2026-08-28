@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ArrowRight, AlertCircle, RefreshCw } from "lucide-react";
 import { useLocale } from "@/i18n";
@@ -12,6 +12,7 @@ export default function Conferencia() {
   const { locale, t } = useLocale();
   const router = useRouter();
   const { imageFile, detectionResult, setDetectionResult, setImageFile } = useDetection();
+  const isRejecting = useRef(false);
 
   const userImageUrl = useMemo(() => {
     return imageFile ? URL.createObjectURL(imageFile) : null;
@@ -23,16 +24,14 @@ export default function Conferencia() {
     };
   }, [userImageUrl]);
 
-  // Se não encontrou a peça ou deu erro, volta para a tela de captura
+  // Se não encontrou a peça, deu erro, ou a confiança for baixa, vai para a tela de resultado
   useEffect(() => {
-    if (!detectionResult || !detectionResult.id) {
-      setImageFile(null);
-      setDetectionResult(null);
-      router.replace("/capturar");
+    if (!isRejecting.current && (!detectionResult || !detectionResult.id || (detectionResult.confianca ?? 0) < 80)) {
+      router.replace("/resultado");
     }
-  }, [detectionResult, router, setImageFile, setDetectionResult]);
+  }, [detectionResult, router]);
 
-  if (!detectionResult || !detectionResult.id) {
+  if (!detectionResult || !detectionResult.id || (detectionResult.confianca ?? 0) < 80) {
     return (
       <div className="flex h-screen items-center justify-center bg-black">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -52,6 +51,7 @@ export default function Conferencia() {
   };
 
   const handleReject = () => {
+    isRejecting.current = true;
     setImageFile(null);
     setDetectionResult(null);
     router.push("/capturar");
