@@ -118,7 +118,7 @@ export default function Capturar() {
 
       <div className="mt-4 flex items-center gap-3 rounded-xl bg-blue-500/20 px-4 py-3 text-sm text-blue-100 border border-blue-500/30 mx-auto w-full max-w-md sm:max-w-sm">
         <AlertCircle className="h-5 w-5 text-blue-400 shrink-0" />
-        <p>Fotografe apenas <strong>uma peça</strong> por vez para maior precisão.</p>
+        <p>{t("capture.onePartWarning1")}<strong>{t("capture.onePartWarning2")}</strong>{t("capture.onePartWarning3")}</p>
       </div>
 
       {/* Viewfinder — compact on desktop, full-bleed on mobile */}
