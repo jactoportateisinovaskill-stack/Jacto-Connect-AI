@@ -1,5 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel
+from typing import Optional
 
 # modelo de retorno das peças
 class DeteccaoPeca(BaseModel):
@@ -60,3 +61,14 @@ class HistoricoCreate(BaseModel):
     url_foto_client: str
     confianca_ia: float
     status: str
+
+class BuscaSemanticaRequest(BaseModel):
+    query: str
+    maquina_id: Optional[int] = None
+    limit: int = 3
+
+class ResultadoBuscaSemantica(BaseModel):
+    id: int
+    nome: str
+    codigo_jacto: str
+    score_similaridade: float
