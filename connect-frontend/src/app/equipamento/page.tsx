@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Wrench, Check, ArrowRight } from "lucide-react";
 import { Shell } from "@/components/jacto/Shell";
+import { SearchModal } from "@/components/jacto/SearchModal";
 import { useT, useLocale } from "@/i18n";
 import { useEquipment, EMPTY_EQUIPMENT } from "@/lib/equipment";
 import { getTranslatedMachineName } from "@/lib/parts-translations";
@@ -18,6 +19,7 @@ export default function EquipmentPage() {
   const [selected, setSelected] = useState<string>(stored?.modelo || "");
   const [machines, setMachines] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     fetch("http://127.0.0.1:8000/api/database/maquinas")
@@ -53,7 +55,7 @@ export default function EquipmentPage() {
   const confirm = () => {
     if (!selected) return;
     save({ ...EMPTY_EQUIPMENT, ...(stored ?? {}), modelo: selected });
-    router.push("/capturar");
+    setSearchOpen(true);
   };
 
   const skip = () => router.push("/capturar");
@@ -161,6 +163,8 @@ export default function EquipmentPage() {
           </button>
         </div>
       </div>
+      
+      <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
     </Shell>
   );
 }
