@@ -9,6 +9,7 @@ import { SearchModal } from "@/components/jacto/SearchModal";
 import { useT, useLocale } from "@/i18n";
 import { useEquipment, EMPTY_EQUIPMENT } from "@/lib/equipment";
 import { getTranslatedMachineName } from "@/lib/parts-translations";
+import { API_URL } from "@/lib/api";
 
 
 export default function EquipmentPage() {
@@ -22,7 +23,7 @@ export default function EquipmentPage() {
   const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/database/maquinas")
+    fetch(`${API_URL}/database/maquinas`)
       .then(res => res.json())
       .then(data => {
         // Se a API retornar um array vazio, usa o fallback, senão mapeia os dados do backend

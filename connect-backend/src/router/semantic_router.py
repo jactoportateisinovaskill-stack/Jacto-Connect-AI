@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from src.schemas.api_schemas import (
@@ -9,19 +9,26 @@ from src.schemas.api_schemas import (
 from src.database.database_dependencies import get_db
 from src.repository.peca_repository import PecaRepository
 from src.services.semantic_service import semantic_service
+from src.services.url_service import get_bucket_url
 
-router = APIRouter(prefix="/api/busca-semantica", tags=["busca-semantica"])
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
+router = APIRouter(prefix="/api/v1/pecas/busca-semantica", tags=["busca-semantica"])
 peca_repository = PecaRepository()
 
 @router.post("", response_model=list[ResultadoBuscaSemantica])
+@limiter.limit("15/minute")
 async def busca_semantica(
-    request: BuscaSemanticaRequest, 
+    request: Request,
+    body: BuscaSemanticaRequest, 
     db: Session = Depends(get_db)
 ):
     try:
         # Gerar embedding da query
         query_embedding = semantic_service.generate_embedding(
-            text=request.query, 
+            text=body.query, 
             prompt_name="query"
         )
         
@@ -29,7 +36,7 @@ async def busca_semantica(
         results = peca_repository.search_by_embedding(
             db=db, 
             query_embedding=query_embedding, 
-            limit=request.limit
+            limit=body.limit
         )
         
         response = []
@@ -43,7 +50,8 @@ async def busca_semantica(
                     id=row.id,
                     nome=row.nome,
                     codigo_jacto=row.codigo_jacto,
-                    score_similaridade=round(similaridade, 2)
+                    score_similaridade=round(similaridade, 2),
+                    url_foto_principal=get_bucket_url(row.url_foto_principal) if row.url_foto_principal else None
                 )
             )
             

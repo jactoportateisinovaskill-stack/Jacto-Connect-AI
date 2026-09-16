@@ -41,6 +41,7 @@ import {
 import { toast } from "sonner";
 import { useDetection } from "@/lib/DetectionContext";
 import { useEquipment } from "@/lib/equipment";
+import { API_URL } from "@/lib/api";
 
 interface Related {
   code: string;
@@ -67,8 +68,8 @@ export default function Resultado() {
     if (!detectionResult?.id) return;
 
     Promise.all([
-      fetch("http://127.0.0.1:8000/api/database/pecas").then(r => r.json()),
-      fetch("http://127.0.0.1:8000/api/database/peca-relacionada").then(r => r.json())
+      fetch(`${API_URL}/database/pecas`).then(r => r.json()),
+      fetch(`${API_URL}/database/peca-relacionada`).then(r => r.json())
     ]).then(([parts, relations]) => {
       if (Array.isArray(parts) && Array.isArray(relations)) {
         const myRelations = relations.filter((r: any) => r.peca_id === detectionResult.id);

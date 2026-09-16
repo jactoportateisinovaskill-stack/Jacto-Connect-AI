@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 
 # modelo de retorno das peças
@@ -63,12 +63,20 @@ class HistoricoCreate(BaseModel):
     status: str
 
 class BuscaSemanticaRequest(BaseModel):
-    query: str
+    query: str = Field(..., max_length=100)
     maquina_id: Optional[int] = None
     limit: int = 3
+    
+    @field_validator('query')
+    @classmethod
+    def sanitize_query(cls, v: str) -> str:
+        # Remove null bytes, escape chars maliciosos e espaços nas extremidades
+        v = v.replace('\x00', '')
+        return v.strip()
 
 class ResultadoBuscaSemantica(BaseModel):
     id: int
     nome: str
     codigo_jacto: str
     score_similaridade: float
+    url_foto_principal: Optional[str] = None
