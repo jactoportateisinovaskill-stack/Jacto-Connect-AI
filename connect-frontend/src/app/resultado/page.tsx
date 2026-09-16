@@ -81,7 +81,7 @@ export default function Resultado() {
             name: getTranslatedPartName(p.codigo_jacto, p.nome, locale),
             compat: "Compatível"
           };
-        }).filter(Boolean);
+        }).filter((item): item is Related => item !== null);
         setRelatedParts(mapped);
       }
     }).catch(err => {
