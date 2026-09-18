@@ -113,7 +113,7 @@ export default function Resultado() {
         <div className="relative mx-auto w-full max-w-[260px] overflow-hidden rounded-2xl bg-secondary shadow-[var(--shadow-card)]">
           <img src={imageUrl} alt="Foto oficial da peça" className="w-full aspect-[4/3] object-cover bg-white" />
           <div className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-extrabold shadow-md ${detectionResult?.id ? 'bg-success text-success-foreground' : 'bg-red-500 text-white'}`}>
-            {detectionResult?.id ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />} {confidencePercent}%
+            {detectionResult?.id ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />} {detectionResult?.isManualSelection ? "Peça selecionada" : `${confidencePercent}%`}
           </div>
           <div className="absolute top-2 right-2 rounded-full bg-black/50 backdrop-blur px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white">
             {detectionResult?.id ? t("compat.identified") : t("result.notFound")}
@@ -121,7 +121,7 @@ export default function Resultado() {
         </div>
 
         {/* Low Confidence Warning */}
-        {confidencePercent < 80 && (
+        {confidencePercent < 80 && !detectionResult?.isManualSelection && (
           <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-yellow-500/40 bg-yellow-500/10 p-5 text-center shadow-[var(--shadow-card)]">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500/20">
               <AlertCircle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />

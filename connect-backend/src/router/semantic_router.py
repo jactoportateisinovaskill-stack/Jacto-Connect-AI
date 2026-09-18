@@ -9,7 +9,7 @@ from src.schemas.api_schemas import (
 from src.database.database_dependencies import get_db
 from src.repository.peca_repository import PecaRepository
 from src.services.semantic_service import semantic_service
-from src.services.url_service import get_bucket_url
+from src.services.url_service import get_bucket_url, get_pdf_url
 
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -51,7 +51,11 @@ async def busca_semantica(
                     nome=row.nome,
                     codigo_jacto=row.codigo_jacto,
                     score_similaridade=round(similaridade, 2),
-                    url_foto_principal=get_bucket_url(row.url_foto_principal) if row.url_foto_principal else None
+                    url_foto_principal=get_bucket_url(row.url_foto_principal) if row.url_foto_principal else None,
+                    url_compra=row.url_compra,
+                    url_video=row.url_video,
+                    url_catalogo=get_pdf_url("Catalogo_Pecas.pdf"),
+                    url_manual=get_pdf_url("Manual_Usuario.pdf")
                 )
             )
             

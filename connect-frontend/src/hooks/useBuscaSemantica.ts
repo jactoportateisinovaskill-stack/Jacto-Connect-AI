@@ -8,6 +8,10 @@ export interface BuscaSemanticaResult {
   codigo_jacto: string;
   score_similaridade: number;
   url_foto_principal?: string;
+  url_compra?: string;
+  url_video?: string;
+  url_catalogo?: string;
+  url_manual?: string;
 }
 
 export function useBuscaSemantica(query: string, delay = 500) {

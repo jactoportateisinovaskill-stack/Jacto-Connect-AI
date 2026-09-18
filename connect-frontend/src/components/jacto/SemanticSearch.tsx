@@ -42,13 +42,18 @@ export function SemanticSearch({ onSelect }: SemanticSearchProps) {
   const handleSelect = (item: BuscaSemanticaResult) => {
     setSelectedId(item.id);
     
-    // Simulamos um resultado de "detecção" de alta confiança para navegação posterior
+    // resultado fixo de confiança, pois foi utilizado a busca manual
     setDetectionResult({
       id: item.id,
       nome_peca: item.nome,
       codigo: item.codigo_jacto,
-      confianca: item.score_similaridade, // score mapeado como confiança
+      confianca: 80, // 80% de confiança pois a escolha foi manual (ignora score de similaridade do embedding)
+      isManualSelection: true,
       url_foto_principal: item.url_foto_principal || "",
+      url_compra: item.url_compra,
+      url_video: item.url_video,
+      url_catalogo: item.url_catalogo,
+      url_manual: item.url_manual,
     });
     
     if (onSelect) {

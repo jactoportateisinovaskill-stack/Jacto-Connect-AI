@@ -62,7 +62,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
               disabled={!selectedItem}
               onClick={() => {
                 onOpenChange(false);
-                router.push("/conferencia");
+                router.push("/resultado");
               }}
               className="flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition active:scale-[0.98] disabled:opacity-50"
             >

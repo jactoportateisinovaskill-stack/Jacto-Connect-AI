@@ -23,6 +23,8 @@ class PecaRepository(BaseRepository):
                 self.model.nome,
                 self.model.codigo_jacto,
                 self.model.url_foto_principal,
+                self.model.url_compra,
+                self.model.url_video,
                 self.model.embedding.cosine_distance(query_embedding).label("distance")
             )
             .where(self.model.embedding != None)

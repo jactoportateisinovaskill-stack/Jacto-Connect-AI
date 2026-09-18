@@ -80,3 +80,7 @@ class ResultadoBuscaSemantica(BaseModel):
     codigo_jacto: str
     score_similaridade: float
     url_foto_principal: Optional[str] = None
+    url_compra: Optional[str] = None
+    url_video: Optional[str] = None
+    url_catalogo: Optional[str] = None
+    url_manual: Optional[str] = None
