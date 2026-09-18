@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Wrench, Check, ArrowRight } from "lucide-react";
 import { Shell } from "@/components/jacto/Shell";
 import { SearchModal } from "@/components/jacto/SearchModal";
+import { EquipmentCatalogModal } from "@/components/jacto/EquipmentCatalogModal";
 import { useT, useLocale } from "@/i18n";
 import { useEquipment, EMPTY_EQUIPMENT } from "@/lib/equipment";
 import { getTranslatedMachineName } from "@/lib/parts-translations";
@@ -20,6 +21,7 @@ export default function EquipmentPage() {
   const [selected, setSelected] = useState<string>(stored?.modelo || "");
   const [machines, setMachines] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [catalogOpen, setCatalogOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
@@ -32,7 +34,8 @@ export default function EquipmentPage() {
             id: m.modelo,
             name: getTranslatedMachineName(m.nome, locale),
             tag: m.modelo,
-            img: m.url_imagem ? m.url_imagem : "/assets/no-image.svg"
+            img: m.url_imagem ? m.url_imagem : "/assets/no-image.svg",
+            url_catalogo: m.url_catalogo
           }));
           setMachines(formatted);
         } else {
@@ -45,7 +48,7 @@ export default function EquipmentPage() {
         setMachines(getFallbackModels());
         setLoading(false);
       });
-      
+
     function getFallbackModels() {
       return [];
     }
@@ -56,7 +59,7 @@ export default function EquipmentPage() {
   const confirm = () => {
     if (!selected) return;
     save({ ...EMPTY_EQUIPMENT, ...(stored ?? {}), modelo: selected });
-    setSearchOpen(true);
+    setCatalogOpen(true);
   };
 
   const skip = () => router.push("/capturar");
@@ -88,11 +91,10 @@ export default function EquipmentPage() {
                 key={m.id}
                 type="button"
                 onClick={() => setSelected(m.id)}
-                className={`group relative overflow-hidden rounded-xl border bg-background p-2 text-left transition active:scale-[0.98] ${
-                  active
+                className={`group relative overflow-hidden rounded-xl border bg-background p-2 text-left transition active:scale-[0.98] ${active
                     ? "border-primary shadow-[var(--shadow-glow)] ring-2 ring-primary/30"
                     : "border-border hover:border-primary/40"
-                }`}
+                  }`}
               >
                 <div className="flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg bg-white p-3">
                   {typeof m.img === 'string' ? (
@@ -164,7 +166,13 @@ export default function EquipmentPage() {
           </button>
         </div>
       </div>
-      
+
+      <EquipmentCatalogModal 
+        open={catalogOpen} 
+        onOpenChange={setCatalogOpen} 
+        urlCatalogo={current?.url_catalogo}
+        onConfirm={() => setSearchOpen(true)}
+      />
       <SearchModal open={searchOpen} onOpenChange={setSearchOpen} />
     </Shell>
   );

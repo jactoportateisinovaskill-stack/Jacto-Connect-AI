@@ -27,7 +27,8 @@ class MaquinaResponse(BaseModel):
     id: int
     nome: str
     modelo: str
-    url_imagem: str 
+    url_imagem: str
+    url_catalogo: str 
 
 class HistoricoResponse(BaseModel):
     id: int
