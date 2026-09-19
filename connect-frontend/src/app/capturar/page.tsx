@@ -111,7 +111,7 @@ export default function Capturar() {
   };
 
   return (
-    <Shell back="/" title={t("capture.title")} bg="dark">
+    <Shell back="/equipamento" title={t("capture.title")} bg="dark">
       <p className="mt-1 text-sm text-white/60">
         {t("capture.subtitle")}
       </p>
@@ -227,9 +227,7 @@ export default function Capturar() {
           <span className="absolute inset-1.5 rounded-full border-2 border-white/40" />
           <Camera className="h-7 w-7" />
         </button>
-
         <div className="h-12 w-12" aria-hidden />
-
       </div>
 
       <input

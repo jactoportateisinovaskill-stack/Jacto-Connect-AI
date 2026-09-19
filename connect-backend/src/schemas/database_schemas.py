@@ -3,6 +3,8 @@ from decimal import Decimal
 
 from sqlalchemy import TIMESTAMP, func, ForeignKey, Numeric
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from pgvector.sqlalchemy import Vector
+from typing import Optional
 
 class Base(DeclarativeBase):
     pass
@@ -15,9 +17,10 @@ class Pecas(Base):
     codigo_jacto: Mapped[str]
     nome: Mapped[str]
     url_compra: Mapped[str]
-    url_video: Mapped[str]
+    url_video: Mapped[Optional[str]]
     ativo: Mapped[bool]
     url_foto_principal: Mapped[str]
+    embedding: Mapped[Optional[list[float]]] = mapped_column(Vector(768))
 
 class Maquinas(Base):
 

@@ -7,6 +7,7 @@ export interface DetectionResult {
   nome_peca: string;
   codigo: string;
   confianca: number;
+  isManualSelection?: boolean;
   url_compra?: string;
   url_video?: string;
   url_foto_principal?: string;

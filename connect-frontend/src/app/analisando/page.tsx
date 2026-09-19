@@ -7,6 +7,7 @@ import { useT } from "@/i18n";
 import { Shell } from "@/components/jacto/Shell";
 import { useDetection } from "@/lib/DetectionContext";
 import { toast } from "sonner";
+import { API_URL } from "@/lib/api";
 
 export default function Analisando() {
   const t = useT();
@@ -63,7 +64,7 @@ export default function Analisando() {
         const formData = new FormData();
         formData.append("foto", imageFile);
         
-        const res = await fetch("http://localhost:8000/api/detection", {
+        const res = await fetch(`${API_URL}/detection`, {
           method: "POST",
           body: formData,
         });

@@ -1,12 +1,18 @@
-from ultralytics import YOLO
-from PIL import Image
-
+from functools import lru_cache
+from pathlib import Path
 import io
 
-model_path: str = "src/yolo_model/best.pt"
-model = YOLO(model_path)
+from PIL import Image
+from ultralytics import YOLO
+
+MODEL_PATH = Path(__file__).resolve().parent.parent / "yolo_model" / "best.pt"
+
+@lru_cache(maxsize=1)
+def get_model() -> YOLO:
+    return YOLO(str(MODEL_PATH))
 
 def detectar_peca(image_bytes: bytes) -> dict:
+    model = get_model()
     imagem = Image.open(io.BytesIO(image_bytes))
 
     resultados = model(imagem, conf=0.75, iou=0.30)
