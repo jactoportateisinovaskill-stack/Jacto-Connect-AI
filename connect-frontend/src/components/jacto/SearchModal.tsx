@@ -53,7 +53,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                 onOpenChange(false);
                 router.push("/capturar");
               }}
-              className="rounded-lg px-4 py-2 text-xs font-semibold text-muted-foreground transition hover:bg-muted"
+              className="flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition active:scale-[0.98]"
             >
               {t("search.skip")}
             </button>
@@ -64,7 +64,9 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
                 onOpenChange(false);
                 router.push("/resultado");
               }}
-              className="flex h-11 items-center justify-center gap-2 rounded-lg bg-primary px-6 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition active:scale-[0.98] disabled:opacity-50"
+              className={`flex h-11 items-center justify-center gap-2 rounded-lg bg-white border px-6 text-sm font-bold shadow-sm transition active:scale-[0.98] disabled:opacity-50 ${
+                selectedItem ? 'border-primary text-primary' : 'border-input text-muted-foreground'
+              }`}
             >
               {t("common.continue")} <ArrowRight className="h-4 w-4" />
             </button>
