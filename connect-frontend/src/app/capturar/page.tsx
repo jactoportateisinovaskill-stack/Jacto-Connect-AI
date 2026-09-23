@@ -176,9 +176,7 @@ export default function Capturar() {
             <span className="absolute -top-px -right-px h-5 w-5 border-t-4 border-r-4 border-primary rounded-tr-2xl" />
             <span className="absolute -bottom-px -left-px h-5 w-5 border-b-4 border-l-4 border-primary rounded-bl-2xl" />
             <span className="absolute -bottom-px -right-px h-5 w-5 border-b-4 border-r-4 border-primary rounded-br-2xl" />
-            {!preview && !cameraError && (
-              <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-primary to-transparent animate-scan" />
-            )}
+
           </div>
 
           <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 backdrop-blur px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">

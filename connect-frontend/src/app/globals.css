@@ -79,10 +79,10 @@
 }
 
 @keyframes scan-line {
-  0%, 100% { transform: translateY(-100%); }
-  50% { transform: translateY(100%); }
+  0%, 100% { top: 0%; transform: translateY(0); }
+  50% { top: 100%; transform: translateY(-100%); }
 }
-.animate-scan { animation: scan-line 2.2s ease-in-out infinite; }
+.animate-scan { animation: scan-line 3.5s ease-in-out infinite; }
 
 @keyframes pulse-ring {
   0% { transform: scale(0.8); opacity: 0.8; }
