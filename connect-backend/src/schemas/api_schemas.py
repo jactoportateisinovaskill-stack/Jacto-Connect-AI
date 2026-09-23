@@ -28,7 +28,7 @@ class MaquinaResponse(BaseModel):
     nome: str
     modelo: str
     url_imagem: str
-    url_catalogo: str 
+    url_catalogo: str | None = None
 
 class HistoricoResponse(BaseModel):
     id: int

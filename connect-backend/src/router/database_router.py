@@ -12,7 +12,7 @@ from src.schemas.database_schemas import (
     Observacoes, Historico, Maquinas
 )
 
-from src.services.url_service import get_maquina_url, get_pdf_url
+from src.services.url_service import get_maquina_url
 
 from src.repository.base_repository import BaseRepository
 
@@ -50,7 +50,7 @@ async def get_all_maquinas(db: Session = Depends(get_db)):
             nome=m.nome,
             modelo=m.modelo,
             url_imagem=get_maquina_url(m.url_imagem) if m.url_imagem else "",
-            url_catalogo=get_pdf_url("Visao_Explodida_SB.jpg")
+        url_catalogo="catalogo_sb_imgs/Catalogo_Pecas_SB" if m.modelo == "SB" else None
         ) for m in maquinas
     ]
 
@@ -64,7 +64,7 @@ async def get_maquina_id(maquina_id: int, db: Session = Depends(get_db)):
         nome=maquina.nome,
         modelo=maquina.modelo,
         url_imagem=get_maquina_url(maquina.url_imagem) if maquina.url_imagem else "",
-        url_catalogo=get_pdf_url("Visao_Explodida_SB.jpg")
+        url_catalogo="catalogo_sb_imgs/Catalogo_Pecas_SB" if maquina.modelo == "SB" else None
     )
 
 

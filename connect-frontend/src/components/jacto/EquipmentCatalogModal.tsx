@@ -60,7 +60,7 @@ export function EquipmentCatalogModal({ open, onOpenChange, urlCatalogo, onConfi
                 <CarouselContent className="h-full">
                   {Array.from({ length: 6 }).map((_, index) => {
                     const pageNumber = String(index + 1).padStart(4, '0');
-                    const imgUrl = `https://bzhflihrkxgtkyldhgxs.supabase.co/storage/v1/object/public/catalogo_sb_imgs/Catalogo_Pecas_SB_page-${pageNumber}.jpg`;
+                    const imgUrl = `https://bzhflihrkxgtkyldhgxs.supabase.co/storage/v1/object/public/${urlCatalogo}_page-${pageNumber}.jpg`;
                     return (
                       <CarouselItem key={index} className="flex items-center justify-center">
                         <TransformWrapper
