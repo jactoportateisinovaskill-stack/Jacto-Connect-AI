@@ -23,6 +23,8 @@ export default function Capturar() {
 
   const goAnalyze = useCallback(() => router.push("/analisando"), [router]);
 
+  const isActiveRef = useRef(true);
+
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach((track) => track.stop());
@@ -37,6 +39,16 @@ export default function Capturar() {
       const newStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" }
       });
+      
+      if (!isActiveRef.current) {
+        newStream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      
       streamRef.current = newStream;
       setStream(newStream);
       if (videoRef.current) {
@@ -44,15 +56,16 @@ export default function Capturar() {
       }
     } catch (err: any) {
       console.error("Erro ao acessar a câmera:", err);
-      setCameraError(err.message || "default");
+      if (isActiveRef.current) setCameraError(err.message || "default");
     }
   }, []);
 
   // Iniciar a câmera ao montar a página
   useEffect(() => {
+    isActiveRef.current = true;
     startCamera();
     return () => {
-      // Quando o componente desmontar (ou sair da página), desliga a câmera!
+      isActiveRef.current = false;
       stopCamera();
     };
   }, [startCamera, stopCamera]);

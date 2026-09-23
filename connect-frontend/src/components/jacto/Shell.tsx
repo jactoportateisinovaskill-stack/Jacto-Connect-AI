@@ -28,9 +28,10 @@ interface ShellProps {
   title?: string;
   showMenu?: boolean;
   bg?: "white" | "muted" | "dark";
+  headerAction?: ReactNode;
 }
 
-export function Shell({ children, back, title, showMenu, bg = "white" }: ShellProps) {
+export function Shell({ children, back, title, showMenu, bg = "white", headerAction }: ShellProps) {
   const bgClass =
     bg === "muted" ? "bg-muted" : bg === "dark" ? "bg-secondary text-secondary-foreground" : "bg-background";
   const tone = bg === "dark" ? "dark" : "light";
@@ -58,6 +59,7 @@ export function Shell({ children, back, title, showMenu, bg = "white" }: ShellPr
           )}
         </div>
         <div className="flex items-center gap-2">
+          {headerAction}
           <LanguageSwitcher tone={tone} />
           {showMenu && isManager && (
             <Link

@@ -25,6 +25,7 @@ import {
   Shield,
   Check,
   AlertCircle,
+  LogOut,
 } from "lucide-react";
 import { useT, useLocale } from "@/i18n";
 import { getTranslatedPartName } from "@/lib/parts-translations";
@@ -201,7 +202,19 @@ export default function Resultado() {
   const confidencePercent = detectionResult ? Math.round(detectionResult.confianca) : 0;
 
   return (
-    <Shell back="/capturar" title={t("result.title")}>
+    <Shell 
+      back="/capturar" 
+      title={t("result.title")}
+      headerAction={
+        <button
+          onClick={() => router.push("/equipamento")}
+          className="flex h-8 items-center gap-1.5 rounded-full bg-destructive/10 px-3 text-xs font-bold text-destructive hover:bg-destructive/20 transition"
+        >
+          <LogOut className="h-3 w-3" />
+          {t("common.logout")}
+        </button>
+      }
+    >
       <div className="mt-2 animate-slide-up">
         {/* Hero image */}
         <div className="relative mx-auto w-full max-w-[260px] overflow-hidden rounded-2xl bg-secondary shadow-[var(--shadow-card)]">
@@ -526,6 +539,7 @@ export default function Resultado() {
             </>
           )}
         </div>
+
       </div>
     </Shell>
   );
