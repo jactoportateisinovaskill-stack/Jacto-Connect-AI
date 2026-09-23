@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from decimal import Decimal
 
 from sqlalchemy import TIMESTAMP, func, ForeignKey, Numeric
@@ -36,14 +36,14 @@ class Historico(Base):
     __tablename__ = "historico_identificacoes"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    maquina_id: Mapped[int] = mapped_column(ForeignKey("maquinas.id", ondelete="CASCADE"))
-    peca_identificada_id: Mapped[int] = mapped_column(ForeignKey("pecas.id", ondelete="CASCADE"))
-    url_foto_client: Mapped[str]
+    maquina_id: Mapped[Optional[int]] = mapped_column(ForeignKey("maquinas.id", ondelete="CASCADE"), nullable=True)
+    peca_identificada_id: Mapped[Optional[int]] = mapped_column(ForeignKey("pecas.id", ondelete="CASCADE"), nullable=True)
+    url_foto_cliente: Mapped[str]
     confianca_ia: Mapped[Decimal] = mapped_column(Numeric(5, 2))
     status: Mapped[str]
     data_identificacao: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True), 
-        server_default=func.now()
+        default=lambda: datetime.now(timezone(timedelta(hours=-3)))
     )
 
 class Avaliacoes(Base):

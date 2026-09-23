@@ -32,9 +32,9 @@ class MaquinaResponse(BaseModel):
 
 class HistoricoResponse(BaseModel):
     id: int
-    maquina_id: int
-    peca_identificada_id: int
-    url_foto_client: str
+    maquina_id: Optional[int] = None
+    peca_identificada_id: Optional[int] = None
+    url_foto_cliente: str
     confianca_ia: float
     status: str
     data_identificacao: datetime
@@ -57,11 +57,15 @@ class PecaRelacionadaResponse(BaseModel):
 
 
 class HistoricoCreate(BaseModel):
-    maquina_id: int
-    peca_identificada_id: int
-    url_foto_client: str
+    maquina_id: Optional[int] = None
+    peca_identificada_id: Optional[int] = None
+    url_foto_cliente: str
     confianca_ia: float
     status: str
+
+class AvaliacaoCreate(BaseModel):
+    historico_id: int
+    nota: int
 
 class BuscaSemanticaRequest(BaseModel):
     query: str = Field(..., max_length=100)

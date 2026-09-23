@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, File, UploadFile
 from src.schemas.storage_schemas import BucketCreateRequest
 from src.services.storage_service import StorageService
 
-router = APIRouter()
+router = APIRouter(prefix="/api/storage")
 
 @router.post("/buckets", status_code=201)
 def create_new_bucket(request: BucketCreateRequest):

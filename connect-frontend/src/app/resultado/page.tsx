@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -56,13 +56,91 @@ export default function Resultado() {
   const [hover, setHover] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
-  const { detectionResult } = useDetection();
+  const { detectionResult, imageFile } = useDetection();
   const [stored] = useEquipment();
   const [relatedParts, setRelatedParts] = useState<Related[]>([]);
 
   const imageUrl = (detectionResult?.url_foto_principal && !detectionResult.url_foto_principal.endsWith("None"))
     ? detectionResult.url_foto_principal
     : "/assets/no-image.svg";
+
+  const [historicoId, setHistoricoId] = useState<number | null>(null);
+  const historicoSalvoRef = useRef(false);
+
+  useEffect(() => {
+    // Só roda se já não salvou o histórico. A tela de resultado sempre deve registrar.
+    if (historicoSalvoRef.current) return;
+
+    const salvarHistorico = async () => {
+      historicoSalvoRef.current = true;
+      try {
+        let fileUrl = "";
+        
+        let currentModelo = stored?.modelo;
+        if (!currentModelo) {
+          try {
+            const raw = window.localStorage.getItem("jacto:equipment");
+            if (raw) currentModelo = JSON.parse(raw).modelo;
+          } catch {}
+        }
+
+        // Se houver uma foto tirada pelo usuário salva no contexto, fazemos o upload
+        if (imageFile) {
+          const formData = new FormData();
+          // Garante um nome de arquivo descritivo
+          const sufixoPeca = detectionResult?.id ? `peca_${detectionResult.id}` : "falha";
+          const fileName = `foto_${currentModelo || "Desconhecido"}_${sufixoPeca}_${Date.now()}.jpg`;
+          
+          formData.append("file", imageFile, fileName);
+          
+          const uploadRes = await fetch(`${API_URL}/storage/buckets/historico_fotos/upload`, {
+            method: "POST",
+            body: formData,
+          });
+          
+          if (uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            fileUrl = uploadData?.data?.public_url || "";
+          } else {
+            console.error("Falha no upload da foto", await uploadRes.text());
+          }
+        }
+
+        // Busca o ID real da máquina no banco baseado no modelo
+        let maquinaId = null;
+        if (currentModelo) {
+          const maquinasRes = await fetch(`${API_URL}/database/maquinas`);
+          if (maquinasRes.ok) {
+            const maquinas = await maquinasRes.json();
+            const maquinaAtual = maquinas.find((m: any) => m.modelo?.toLowerCase() === currentModelo?.toLowerCase());
+            if (maquinaAtual) maquinaId = maquinaAtual.id;
+          }
+        }
+
+        // Salva o Histórico
+        const historicoRes = await fetch(`${API_URL}/database/historicos`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            maquina_id: detectionResult?.id ? maquinaId : null,
+            peca_identificada_id: detectionResult?.id || null,
+            url_foto_cliente: fileUrl,
+            confianca_ia: detectionResult?.confianca || 0,
+            status: detectionResult?.id ? "Identificada" : "Não Identificada"
+          })
+        });
+        
+        const historicoData = await historicoRes.json();
+        if (historicoData.id) {
+          setHistoricoId(historicoData.id);
+        }
+      } catch (err) {
+        console.error("Erro ao salvar histórico:", err);
+      }
+    };
+    
+    salvarHistorico();
+  }, [detectionResult, imageFile, stored?.modelo]);
 
   useEffect(() => {
     if (!detectionResult?.id) return;
@@ -90,9 +168,25 @@ export default function Resultado() {
     });
   }, [detectionResult?.id, locale]);
 
-  const submitRating = () => {
+  const submitRating = async () => {
     if (rating === 0 || submitted) return;
     setSubmitted(true);
+    
+    if (historicoId) {
+      try {
+        await fetch(`${API_URL}/database/avaliacoes`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            historico_id: historicoId,
+            nota: rating
+          })
+        });
+      } catch (err) {
+        console.error("Erro ao enviar avaliação:", err);
+      }
+    }
+
     toast.success(t("rating.success"), {
       description: `${t("rating.feedback")} (${rating}/5).`,
     });
@@ -146,10 +240,12 @@ export default function Resultado() {
           <h2 className="mt-2 text-2xl font-extrabold leading-tight text-secondary">
             {detectedName}
           </h2>
-          <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
-            <Tractor className="h-4 w-4 text-secondary" />
-            {t("result.usage")} <span className="font-semibold text-secondary">{stored?.modelo ? `Jacto ${stored.modelo}` : `Jacto (${t("result.unknown")})`}</span>
-          </div>
+          {detectionResult?.id && (
+            <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
+              <Tractor className="h-4 w-4 text-secondary" />
+              {t("result.usage")} <span className="font-semibold text-secondary">{stored?.modelo ? `Jacto ${stored.modelo}` : `Jacto (${t("result.unknown")})`}</span>
+            </div>
+          )}
         </div>
 
         {/* Actions */}

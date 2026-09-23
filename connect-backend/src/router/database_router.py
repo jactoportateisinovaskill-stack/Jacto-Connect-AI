@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from src.schemas.api_schemas import (
     PecaResponse, MaquinaResponse, HistoricoResponse,
     AvaliacoesResponse, ObservacoesResponse, PecaRelacionadaResponse,
-    HistoricoCreate,
+    HistoricoCreate, AvaliacaoCreate
 )
 
 from src.schemas.database_schemas import (
@@ -67,6 +67,25 @@ async def get_maquina_id(maquina_id: int, db: Session = Depends(get_db)):
         url_catalogo="catalogo_sb_imgs/Catalogo_Pecas_SB" if maquina.modelo == "SB" else None
     )
 
+
+from datetime import datetime, timedelta
+
+@router.post("/historicos", response_model=HistoricoResponse, status_code=status.HTTP_201_CREATED)
+async def create_historico(historico: HistoricoCreate, db: Session = Depends(get_db)):
+    db_historico = Historico(**historico.model_dump())
+    db_historico.data_identificacao = datetime.utcnow() - timedelta(hours=3)
+    db.add(db_historico)
+    db.commit()
+    db.refresh(db_historico)
+    return db_historico
+
+@router.post("/avaliacoes", response_model=AvaliacoesResponse, status_code=status.HTTP_201_CREATED)
+async def create_avaliacao(avaliacao: AvaliacaoCreate, db: Session = Depends(get_db)):
+    db_avaliacao = Avaliacoes(**avaliacao.model_dump())
+    db.add(db_avaliacao)
+    db.commit()
+    db.refresh(db_avaliacao)
+    return db_avaliacao
 
 @router.get("/historicos", response_model=list[HistoricoResponse])
 async def get_all_historicos(db: Session = Depends(get_db)):
