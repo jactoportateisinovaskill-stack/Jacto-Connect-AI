@@ -73,3 +73,10 @@ class PecaRelacionada(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     peca_id: Mapped[int] = mapped_column(ForeignKey("pecas.id", ondelete="CASCADE"))
     peca_relacionada_id: Mapped[int] = mapped_column(ForeignKey("pecas.id", ondelete="CASCADE"))
+
+class PecaMaquina(Base):
+
+    __tablename__ = "peca_maquina"
+
+    id_peca: Mapped[int] = mapped_column(ForeignKey("pecas.id", ondelete="CASCADE"), primary_key=True)
+    id_maquina: Mapped[int] = mapped_column(ForeignKey("maquinas.id", ondelete="CASCADE"), primary_key=True)

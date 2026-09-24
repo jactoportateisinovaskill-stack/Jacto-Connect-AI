@@ -60,6 +60,7 @@ export default function Resultado() {
   const { detectionResult, imageFile } = useDetection();
   const [stored] = useEquipment();
   const [relatedParts, setRelatedParts] = useState<Related[]>([]);
+  const [maquinasCompativeis, setMaquinasCompativeis] = useState<string>("");
 
   const imageUrl = (detectionResult?.url_foto_principal && !detectionResult.url_foto_principal.endsWith("None"))
     ? detectionResult.url_foto_principal
@@ -169,6 +170,20 @@ export default function Resultado() {
     });
   }, [detectionResult?.id, locale]);
 
+  useEffect(() => {
+    if (detectionResult?.id) {
+      fetch(`${API_URL}/database/pecas/${detectionResult.id}/maquinas`)
+        .then(res => res.json())
+        .then(data => {
+            if (Array.isArray(data) && data.length > 0) {
+               setMaquinasCompativeis(data.map(m => m.modelo).join(", "));
+            } else {
+               setMaquinasCompativeis(t("result.unknown"));
+            }
+        }).catch(() => setMaquinasCompativeis(t("result.unknown")));
+    }
+  }, [detectionResult?.id, t]);
+
   const submitRating = async () => {
     if (rating === 0 || submitted) return;
     setSubmitted(true);
@@ -256,7 +271,9 @@ export default function Resultado() {
           {detectionResult?.id && (
             <div className="mt-3 flex items-center gap-2 text-sm text-muted-foreground">
               <Tractor className="h-4 w-4 text-secondary" />
-              {t("result.usage")} <span className="font-semibold text-secondary">{stored?.modelo ? `Jacto ${stored.modelo}` : `Jacto (${t("result.unknown")})`}</span>
+              {t("result.usage")} <span className="font-semibold text-secondary">
+                {maquinasCompativeis ? `Jacto ${maquinasCompativeis}` : "Carregando..."}
+              </span>
             </div>
           )}
         </div>

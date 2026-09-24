@@ -51,7 +51,7 @@ async def get_all_maquinas(db: Session = Depends(get_db)):
             modelo=m.modelo,
             url_imagem=get_maquina_url(m.url_imagem) if m.url_imagem else "",
         url_catalogo="catalogo_sb_imgs/Catalogo_Pecas_SB" if m.modelo == "SB" else None
-        ) for m in maquinas if m.id != 2
+        ) for m in maquinas
     ]
 
 @router.get("/maquinas/{maquina_id}", response_model=MaquinaResponse)
@@ -165,3 +165,45 @@ async def post_historico(entity: HistoricoCreate, db: Session = Depends(get_db))
     return historicos_repository.create(
         entity=entity,
         db=db)
+
+@router.get("/compatibilidade/{maquina_id}/{peca_id}")
+async def check_compatibilidade(maquina_id: int, peca_id: int, db: Session = Depends(get_db)):
+    """
+    Verifica se uma peça é compatível com uma máquina.
+    """
+    from src.schemas.database_schemas import PecaMaquina
+    
+    try:
+        # Verifica se existe a relação
+        relacao = db.query(PecaMaquina).filter(
+            PecaMaquina.id_maquina == maquina_id,
+            PecaMaquina.id_peca == peca_id
+        ).first()
+        
+        if relacao:
+            return {"compativel": True, "mensagem": "A peça é compatível com o equipamento."}
+        else:
+            return {"compativel": False, "mensagem": "Esta peça não é compatível com o equipamento informado."}
+            
+    except Exception as e:
+        db.rollback()
+        return {"compativel": False, "mensagem": "Erro interno ao verificar compatibilidade da peça."}
+
+@router.get("/pecas/{peca_id}/maquinas", response_model=list[MaquinaResponse])
+async def get_maquinas_por_peca(peca_id: int, db: Session = Depends(get_db)):
+    """
+    Retorna as máquinas compatíveis com uma peça específica.
+    """
+    from src.schemas.database_schemas import PecaMaquina, Maquinas
+    
+    maquinas = db.query(Maquinas).join(PecaMaquina, PecaMaquina.id_maquina == Maquinas.id).filter(PecaMaquina.id_peca == peca_id).all()
+    
+    return [
+        MaquinaResponse(
+            id=m.id,
+            nome=m.nome,
+            modelo=m.modelo,
+            url_imagem=get_maquina_url(m.url_imagem) if m.url_imagem else "",
+            url_catalogo="catalogo_sb_imgs/Catalogo_Pecas_SB" if m.modelo == "SB" else None
+        ) for m in maquinas
+    ]
