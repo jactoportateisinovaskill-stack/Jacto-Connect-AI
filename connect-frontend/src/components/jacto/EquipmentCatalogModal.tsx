@@ -58,7 +58,7 @@ export function EquipmentCatalogModal({ open, onOpenChange, urlCatalogo, onConfi
             <div className="relative w-[95vw] h-[80vh] flex items-center justify-center">
               <Carousel className="w-full h-full">
                 <CarouselContent className="h-full">
-                  {Array.from({ length: 6 }).map((_, index) => {
+                  {Array.from({ length: urlCatalogo?.includes("PJH") ? 5 : 6 }).map((_, index) => {
                     const pageNumber = String(index + 1).padStart(4, '0');
                     const imgUrl = `https://bzhflihrkxgtkyldhgxs.supabase.co/storage/v1/object/public/${urlCatalogo}_page-${pageNumber}.jpg`;
                     return (
