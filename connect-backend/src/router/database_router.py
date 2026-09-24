@@ -51,7 +51,7 @@ async def get_all_maquinas(db: Session = Depends(get_db)):
             modelo=m.modelo,
             url_imagem=get_maquina_url(m.url_imagem) if m.url_imagem else "",
         url_catalogo="catalogo_sb_imgs/Catalogo_Pecas_SB" if m.modelo == "SB" else None
-        ) for m in maquinas
+        ) for m in maquinas if m.id != 2
     ]
 
 @router.get("/maquinas/{maquina_id}", response_model=MaquinaResponse)
